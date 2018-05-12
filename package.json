@@ -1,0 +1,26 @@
+{
+  "name": "hotelservice",
+  "version": "1.0.0",
+  "description": "RESTful API with node for Hotel Booking",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarioRose/RESTfulService.git"
+  },
+  "author": "Florian Krull, Mario Rose",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MarioRose/RESTfulService/issues"
+  },
+  "homepage": "https://github.com/MarioRose/RESTfulService#readme",
+  "devDependencies": {
+    "nodemon": "^1.17.4"
+  },
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
