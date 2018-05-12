@@ -1,7 +1,28 @@
-var express = require('express'),
-  app = express(),
-  port = process.env.PORT || 3000;
+var express = require('express');
+var app = express();
+var fs = require("fs");
 
-app.listen(port);
+app.get('/listHotels', function (req, res) {
+	fs.readFile( __dirname + "/" + "hotels.json", 'utf8', function (err, data) {
+		console.log( data );
+		res.end( data );
+	});
+})
 
-console.log('todo list RESTful API server started on: ' + port);
+app.get('/:id', function (req, res) {
+   fs.readFile( __dirname + "/" + "hotels.json", 'utf8', function (err, data) {
+      var hotels = JSON.parse( data );
+      var hotel = hotels["hotel" + req.params.id] 
+      console.log( hotel );
+      res.end( JSON.stringify(hotel));
+   });
+})
+
+var server = app.listen(8081, function () {
+
+var host = server.address().address
+var port = server.address().port
+
+console.log("Example app listening at http://%s:%s", host, port)
+
+})

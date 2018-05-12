@@ -1,0 +1,22 @@
+{
+	"hotel1" : {
+		"name" : "Hilton Hotels",
+		"price" : "100",
+		"id": 1
+	},
+	"hotel2" : {
+		"name" : "Hampton",
+		"price" : "80",
+		"id": 2
+	},
+	"hotel3" : {
+		"name" : "Holiday Inn",
+		"price" : "60",
+		"id": 3
+	},
+	"hotel4" : {
+		"name" : "Motel 6",
+		"price" : "45",
+		"id": 4
+	}
+}
