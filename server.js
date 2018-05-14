@@ -27,6 +27,11 @@ var hotelSchema = mongoose.Schema({
    rooms: [roomSchema]
 });
 
+var orderSchema = mongoose.Schema({
+    hotel : hotelSchema,
+    room : roomSchema
+})
+
 var Hotel = mongoose.model('Hotel', hotelSchema);
 var Room = mongoose.model('Room', roomSchema);
 var hilton = new Hotel({ name: 'Hilton'});
@@ -45,20 +50,32 @@ function save(obj) {
    })
 }
 
-
-
 app.get('/hotels', function (req, res) {
-    Hotel.find({}).exec((err, questions) => {
+    Hotel.find({}).exec((err, hotels) => {
         if (err) return next(err);
-        res.json(questions);
+        res.json(hotels);
       });  
 })
 
+app.delete('/hotels',function (req,res) {
+    Hotel.remove({}).exec(); 
+    console.log('All hotels are removed');
+})
+
 app.get('/hotels/:name', function (req, res) {
-   Hotel.find({name : req.params.name}).exec((err, questions) => {
+   Hotel.find({name : req.params.name}).exec((err, hotel) => {
       if(err) return next(err);
-      res.json(questions);
+      res.json(hotel);
    });
+})
+
+app.delete('/hotels/:name', function (req, res) {
+    Hotel.remove({name : req.params.name}).exec();
+    console.log('Hotel was deleted , name '+req.params.name);
+ })
+
+app.get('/hotels/:name/:number',function(req,res){
+
 })
 
 app.post('/hotels', function(req,res){
