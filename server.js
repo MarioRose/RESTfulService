@@ -50,6 +50,13 @@ app.get('/hotels', function (req, res) {
       });  
 })
 
+app.get('/hotels/:name', function (req, res) {
+   Hotel.find({name : req.params.name}).exec((err, questions) => {
+      if(err) return next(err);
+      res.json(questions);
+   });
+})
+
 app.post('/hotels', function(req,res){
 
 })
