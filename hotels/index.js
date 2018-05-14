@@ -1,5 +1,8 @@
-var express = require('express');
-var app = express();
+const app = require('express').Router();
+const hotels = require('./rooms');
+
+app.use('/hotels', hotels);
+
 var fs = require("fs");
 var parser = require("body-parser");
 
@@ -57,48 +60,27 @@ app.get('/hotels', function (req, res) {
       });  
 })
 
-app.delete('/hotels',function (req,res) {
+app.delete('/',function (req,res) {
     Hotel.remove({}).exec(); 
     console.log('All hotels are removed');
 })
 
-app.post('/hotels', function(req,res){
+app.post('/', function(req,res){
     var newHotel = new Hotel({name: req.body.name})
     console.log(req.body);
     save(newHotel);
 })
 
-app.delete('/hotels/:name', function (req, res) {
+app.delete('/:name', function (req, res) {
     Hotel.remove({name : req.params.name}).exec();
     console.log('Hotel was deleted , name '+req.params.name);
  })
 
- app.get('/hotels/:name', function (req, res) {
+ app.get('/:name', function (req, res) {
     Hotel.find({name : req.params.name}).exec((err, hotel) => {
        if(err) return next(err);
        res.json(hotel);
     });
  })
 
-var router1 = express.Router({mergeParams: true});
-app.use(router1);
-
-router1.get('/:number',function(req,res){
-    Hotel.find({number : req.params.number}).exec((err, room) => {
-       if(err) return next(err);
-       res.json(room);
-     });
-    console.log("Room Number retrieved "+req.params.number);
-})
-
-router1.put('/hotels/:name/:number',function(req,res){
-
-})
-
-var server = app.listen(8081, function () {
-
-   var host = server.address().address
-   var port = server.address().port
-
-   console.log("Hotel app listening at http://%s:%s", host, port)
-})
+module.exports = app;
