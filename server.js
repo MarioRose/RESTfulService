@@ -30,14 +30,23 @@ var room1 = new Room({number: 1, booked: false, price : 29.5});
 var room2 = new Room({number: 2, booked: true, price : 30.0});
 var hiltonRooms = [room1, room2];
 hilton.rooms = hiltonRooms;
-console.log(hilton.name); 
-console.log(hilton.rooms[0].number);
-console.log(hilton.rooms[0].price)
+
+hilton.save(function (err, hilton) {
+    if (err) return console.error(err);
+    console.log('Hotel saved');
+  });
 
 
 
-app.get('/listHotels', function (req, res) {
-   res.end(JSON.stringify(hilton));
+app.get('/hotels', function (req, res) {
+    Hotel.find({}).exec((err, questions) => {
+        if (err) return next(err);
+        res.json(questions);
+      });  
+})
+
+app.post('/hotels', function(req,res){
+
 })
 
 app.get('/:id', function (req, res) {
