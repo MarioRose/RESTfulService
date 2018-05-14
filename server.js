@@ -1,6 +1,10 @@
 var express = require('express');
 var app = express();
 var fs = require("fs");
+var parser = require("body-parser");
+
+app.use(parser.json());
+app.use(parser.urlencoded({extended:true}));
 
 var mongoose = require('mongoose');
 
@@ -58,7 +62,9 @@ app.get('/hotels/:name', function (req, res) {
 })
 
 app.post('/hotels', function(req,res){
-
+    var newHotel = new Hotel({name: req.body.name})
+    console.log(req.body);
+    save(newHotel);
 })
 
 app.get('/:id', function (req, res) {
