@@ -37,10 +37,6 @@ console.log(hilton.rooms[0].price)
 
 
 app.get('/listHotels', function (req, res) {
-	// fs.readFile( __dirname + "/" + "hotels.json", 'utf8', function (err, data) {
-	// 	console.log( data );
-	// 	res.end( data );
-	// });
    res.end(JSON.stringify(hilton));
 })
 
