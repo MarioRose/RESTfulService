@@ -26,15 +26,20 @@ var hotelSchema = mongoose.Schema({
 var Hotel = mongoose.model('Hotel', hotelSchema);
 var Room = mongoose.model('Room', roomSchema);
 var hilton = new Hotel({ name: 'Hilton'});
+var motel1 = new Hotel({ name: 'Motel1'});
 var room1 = new Room({number: 1, booked: false, price : 29.5});
 var room2 = new Room({number: 2, booked: true, price : 30.0});
 var hiltonRooms = [room1, room2];
 hilton.rooms = hiltonRooms;
+save(hilton);
+save(motel1);
 
-hilton.save(function (err, hilton) {
-    if (err) return console.error(err);
-    console.log('Hotel saved');
-  });
+function save(obj) {
+   obj.save(function (err){
+      if(err) return console.error(err);
+      console.log(obj.name + ' saved.');
+   })
+}
 
 
 
