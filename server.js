@@ -28,8 +28,8 @@ var hotelSchema = mongoose.Schema({
 });
 
 var orderSchema = mongoose.Schema({
-   hotel : hotelSchema,
-   room : roomSchema
+   hotelName : String,
+   roomNumber : Number
 });
 
 
@@ -46,12 +46,11 @@ var hiltonRooms = [room1, room2];
 hilton.rooms = hiltonRooms;
 save(hilton);
 save(motel1);
-console.log(hilton.name);
 
 function save(obj) {
    obj.save(function (err){
       if(err) return console.error(err);
-      console.log(obj.name + ' saved.');
+      console.log('Object saved.');
    });
 }
 
@@ -69,7 +68,7 @@ app.delete('/hotels',function (req,res) {
 
 app.post('/hotels', function(req,res){
    var newHotel = new Hotel({name: req.body.name});
-   if(req.body.rooms){
+   if(req.body.hasOwnProperty('rooms')){
       var rooms = new Array();
       for(var room in req.body.rooms){
          var roomNumber = req.body.rooms[room].number;
@@ -109,14 +108,44 @@ app.get('/hotels/:name/:number', function(req, res) {
          }
       } 
    });
-});
+})
 
 app.get('/orders/',function(req,res){
    Order.find({}).exec((err, orders) => {
          if (err) return next(err);
          res.json(orders);
-      }); 
-});
+   }); 
+})
+
+app.post('/orders/', function(req, res){
+   var hotelName = req.body.hotelName;
+   var roomNumber = req.body.roomNumber;
+   Hotel.findOne({ name: hotelName}, function(err, hotel) {
+      if (err) {
+         console.log("invalid name");
+      }
+      if (hotel) {
+         for(var i = 0; i < hotel.rooms.length; i++){
+            if(hotel.rooms[i].number == roomNumber){
+               if(hotel.rooms[i].booked){
+                  res.end("Room is already booked.");
+               } else {
+                  var newOrder = new Order({hotelName: hotel.name, roomNumber: hotel.rooms[i].number});
+                  save(newOrder);
+                  hotel.rooms[i].set({ booked: true});
+                  save(hotel);
+                  res.end("Order successfully created");
+               }
+            }
+         }
+      }
+   })
+})
+
+app.delete('/orders/', function(req, res){
+   Order.remove({}).exec(); 
+   res.end("All orders were successfully removed.")
+})
 
 var server = app.listen(8081, function () {
 
