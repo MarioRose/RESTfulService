@@ -26,7 +26,8 @@ var roomSchema = mongoose.Schema({
 var hotelSchema = mongoose.Schema({
    name: String,
    rooms: [roomSchema],
-   stars : Number
+   stars : Number,
+   location : locationSchema
 });
 
 var orderSchema = mongoose.Schema({
