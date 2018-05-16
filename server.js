@@ -38,14 +38,14 @@ var Room = mongoose.model('Room', roomSchema);
 var Order = mongoose.model('Order',orderSchema);
 
 
-var hilton = new Hotel({ name: 'Hilton'});
-var motel1 = new Hotel({ name: 'Motel1'});
-var room1 = new Room({number: 1, booked: false, price : 29.5});
-var room2 = new Room({number: 2, booked: true, price : 30.0});
-var hiltonRooms = [room1, room2];
-hilton.rooms = hiltonRooms;
-save(hilton);
-save(motel1);
+// var hilton = new Hotel({ name: 'Hilton'});
+// var motel1 = new Hotel({ name: 'Motel1'});
+// var room1 = new Room({number: 1, booked: false, price : 29.5});
+// var room2 = new Room({number: 2, booked: true, price : 30.0});
+// var hiltonRooms = [room1, room2];
+// hilton.rooms = hiltonRooms;
+// save(hilton);
+// save(motel1);
 
 function save(obj) {
    obj.save(function (err){
@@ -84,7 +84,6 @@ app.post('/hotels', function(req,res){
 
 app.delete('/hotels/:name', function (req, res) {
    Hotel.remove({name : req.params.name}).exec();
-   console.log('Hotel was deleted , name '+req.params.name);
    res.end("Hotel " + req.params.name + " was successfully deleted.");
 })
 
@@ -92,6 +91,27 @@ app.get('/hotels/:name', function (req, res) {
    Hotel.find({name : req.params.name}).exec((err, hotel) => {
       if(err) return next(err);
       res.json(hotel);
+   });
+})
+
+app.post('/hotels/:name', function (req, res) {
+   Hotel.findOne({name : req.params.name}).exec((err, hotel) => {
+      if(err) return next(err);
+      for(var i=0; i<hotel.rooms.length; i++){
+         if(hotel.rooms[i].number == req.body.roomNumber){
+            res.end("This room already exists.");
+            return;
+         }
+      }
+      var newRooms = new Array();
+      for(var i=0; i<hotel.rooms.length; i++){
+         newRooms.push(hotel.rooms[i]);
+      }
+      var newRoom = new Room({number: req.body.roomNumber, booked: req.body.roomBooked, price: req.body.roomPrice});
+      newRooms.push(newRoom);
+      hotel.set({rooms: newRooms});
+      save(hotel);
+      res.end("New room was successfully created.");
    });
 })
 
@@ -104,6 +124,48 @@ app.get('/hotels/:name/:number', function(req, res) {
          for(var i = 0; i < hotel.rooms.length; i++){
             if(hotel.rooms[i].number == req.params.number){
                res.json(hotel.rooms[i]);
+            }
+         }
+      } 
+   });
+})
+
+app.delete('/hotels/:name/:number', function(req, res) {
+   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
+      if (err) {
+         console.log("invalid name");
+      }
+      if (hotel) {
+         var newRooms = new Array();
+         for(var i = 0; i < hotel.rooms.length; i++){
+            if(hotel.rooms[i].number != req.params.number){
+               newRooms.push(hotel.rooms[i]);
+            } 
+         }
+         hotel.set({ rooms: newRooms});
+         save(hotel);
+         res.end("Room deleted");
+      } 
+   });
+})
+
+app.put('/hotels/:name/:number', function(req, res) {
+   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
+      if (err) {
+         console.log("invalid name");
+      }
+      if (hotel) {
+         for(var i = 0; i < hotel.rooms.length; i++){
+            if(hotel.rooms[i].number == req.params.number){
+               if(req.body.hasOwnProperty('roomPrice')){
+                  hotel.rooms[i].set({price : req.body.roomPrice});
+                  save(hotel);
+               }
+               if(req.body.hasOwnProperty('roomBooked')){
+                  hotel.rooms[i].set({booked : req.body.roomBooked})
+                  save(hotel);
+               }
+               res.end("Room updated.");
             }
          }
       } 
