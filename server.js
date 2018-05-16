@@ -73,7 +73,7 @@ var bookmarkSchema = mongoose.Schema({
 });
 
 var reservationSchema = mongoose.Schema({
-      hotel : hotelSchema,
+      hotelName : String,
       room : roomSchema,
       startDate : String,
       endDate : String
@@ -142,20 +142,20 @@ app.post('/hotels', function(req,res){
 })
 
 app.delete('/hotels/:name', function (req, res) {
-   Hotel.remove({name : req.params.name}).exec();
+   Hotel.remove({hotelName : req.params.name}).exec();
    console.log('Hotel was deleted , name '+req.params.name);
    res.end("Hotel " + req.params.name + " was successfully deleted.");
 })
 
 app.get('/hotels/:name', function (req, res) {
-   Hotel.find({name : req.params.name}).exec((err, hotel) => {
+   Hotel.find({hotelName : req.params.name}).exec((err, hotel) => {
       if(err) return next(err);
       res.json(hotel);
    });
 })
 
 app.get('/hotels/:name/:number', function(req, res) {
-   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
+   Hotel.findOne({ hotelName: req.params.name }, function(err, hotel) {
       if (err) {
          console.log("invalid name");
       }
@@ -247,6 +247,19 @@ app.delete('/users',function(req,res){
       })
      
 })
+
+app.get('/reviews',function(req,res){
+      Hotel.find({hotelName : req.body.hotelName}).exec((err,hotel)=>{
+            Review.find({})
+      })
+   
+})
+
+app.post('/reviews',function(req,res){
+
+})
+
+app.get('/website')
 
 
 var server = app.listen(8081, function () {
