@@ -42,50 +42,6 @@ var orderSchema = mongoose.Schema({
    roomNumber : Number
 });
 
-var locationSchema = mongoose.Schema({
-      locationName : String,
-      latitude : Number,
-      longitude : Number,
-      Country : String
-});
-
-var userSchema = mongoose.Schema({
-      firstName : String,
-      lastName : String,
-      email : String,
-      password : String
-});
-
-var websiteSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      url : String
-});
-
-var reviewSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      user : userSchema,
-      review : String
-});
-
-var offerSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      room : roomSchema,
-      startDate : String,
-      endDate : String,
-});
-
-var bookmarkSchema = mongoose.Schema({
-      user : userSchema,
-      hotel : hotelSchema,
-});
-
-var reservationSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      room : roomSchema,
-      startDate : String,
-      endDate : String
-});
-
 var userSchema = mongoose.Schema({
       firstName : String,
       lastName : String,
