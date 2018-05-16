@@ -71,15 +71,6 @@ var User = mongoose.model('User',userSchema);
 var Review = mongoose.model('Review', reviewSchema);
 var Offer = mongoose.model('Offer',offerSchema);
 
-// var hilton = new Hotel({ name: 'Hilton',stars:5});
-// var motel1 = new Hotel({ name: 'Motel1',stars:3});
-// var room1 = new Room({number: 1, booked: false, price : 29.5});
-// var room2 = new Room({number: 2, booked: true, price : 30.0,});
-// var hiltonRooms = [room1, room2];
-// hilton.rooms = hiltonRooms;
-// save(hilton);
-// save(motel1);
-
 function save(obj) {
    obj.save(function (err){
       if(err) return console.error(err);
