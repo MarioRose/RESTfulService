@@ -35,6 +35,9 @@ var orderSchema = mongoose.Schema({
 
 var Hotel = mongoose.model('Hotel', hotelSchema);
 var Room = mongoose.model('Room', roomSchema);
+var Order = mongoose.model('Order',orderSchema);
+
+
 var hilton = new Hotel({ name: 'Hilton'});
 var motel1 = new Hotel({ name: 'Motel1'});
 var room1 = new Room({number: 1, booked: false, price : 29.5});
@@ -95,6 +98,13 @@ app.get('/hotels/:name/:number', function(req, res) {
          }
       } 
    });
+});
+
+app.get('/orders/',function(req,res){
+    Order.find({}).exec((err, orders) => {
+        if (err) return next(err);
+        res.json(orders);
+      }); 
 });
 
 var server = app.listen(8081, function () {
