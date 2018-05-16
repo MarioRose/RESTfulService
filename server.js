@@ -30,7 +30,8 @@ var hotelSchema = mongoose.Schema({
 var orderSchema = mongoose.Schema({
     hotel : hotelSchema,
     room : roomSchema
-})
+});
+
 
 var Hotel = mongoose.model('Hotel', hotelSchema);
 var Room = mongoose.model('Room', roomSchema);
@@ -42,6 +43,7 @@ var hiltonRooms = [room1, room2];
 hilton.rooms = hiltonRooms;
 save(hilton);
 save(motel1);
+console.log(hilton.name);
 
 function save(obj) {
    obj.save(function (err){
@@ -80,20 +82,20 @@ app.delete('/hotels/:name', function (req, res) {
     });
  })
 
-var router1 = express.Router({mergeParams: true});
-app.use(router1);
-
-router1.get('/:number',function(req,res){
-    Hotel.find({number : req.params.number}).exec((err, room) => {
-       if(err) return next(err);
-       res.json(room);
-     });
-    console.log("Room Number retrieved "+req.params.number);
-})
-
-router1.put('/hotels/:name/:number',function(req,res){
-
-})
+app.get('/hotels/:name/:number', function(req, res) {
+   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
+      if (err) {
+         console.log("invalid name");
+      }
+      if (hotel) {
+         for(var i = 0; i < hotel.rooms.length; i++){
+            if(hotel.rooms[i].number == req.params.number){
+               res.json(hotel.rooms[i]);
+            }
+         }
+      } 
+   });
+});
 
 var server = app.listen(8081, function () {
 
