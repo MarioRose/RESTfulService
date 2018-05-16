@@ -42,8 +42,6 @@ var orderSchema = mongoose.Schema({
    roomNumber : Number
 });
 
-
-
 var userSchema = mongoose.Schema({
       firstName : String,
       lastName : String,
@@ -106,6 +104,13 @@ function save(obj) {
       if(err) return console.error(err);
       console.log('Object saved.');
    });
+}
+
+function remove(obj){
+      obj.remove(function(err){
+            if(err) return console.error(err);
+            console.log('Object removed');
+      });
 }
 
 app.get('/hotels', function (req, res) {
@@ -225,7 +230,22 @@ app.post('/users',function(req,res){
       if (newUser.firstName == null || newUser.lastName == null || newUser.email == null){
             res.status(400).send("One of the paramters is missing! Bad request");
       }
+      res.json(newUser);
       save(newUser);
+})
+
+app.delete('/users',function(req,res){
+      
+      User.find({email : req.body.email}).exec((err,user)=>{
+            if (user.password == req.body.password){
+                  User.remove({email : req.body.email}).exec();
+            }
+           else{
+                 res.status(401).send("Unauthorized to delete user");
+           }
+
+      })
+     
 })
 
 
