@@ -61,10 +61,11 @@ var reviewSchema = mongoose.Schema({
 });
 
 var offerSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      room : roomSchema,
+      hotelName : String,
+      roomNumber : Number,
       startDate : String,
       endDate : String,
+      discount : String
 });
 
 var bookmarkSchema = mongoose.Schema({
@@ -73,8 +74,8 @@ var bookmarkSchema = mongoose.Schema({
 });
 
 var reservationSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      room : roomSchema,
+      hotelName : String,
+      roomNumber : Number,
       startDate : String,
       endDate : String
 });
@@ -88,16 +89,17 @@ var Website = mongoose.model('Website',websiteSchema);
 var Review = mongoose.model('Review', reviewSchema);
 var Offer = mongoose.model('Offer',offerSchema);
 var Bookmark = mongoose.model('Bookmark',bookmarkSchema);
+var Reservation = mongoose.model('Reservation',reservationSchema);
 
 
-var hilton = new Hotel({ name: 'Hilton',stars:5});
-var motel1 = new Hotel({ name: 'Motel1',stars:3});
-var room1 = new Room({number: 1, booked: false, price : 29.5});
-var room2 = new Room({number: 2, booked: true, price : 30.0,});
-var hiltonRooms = [room1, room2];
-hilton.rooms = hiltonRooms;
-save(hilton);
-save(motel1);
+// var hilton = new Hotel({ name: 'Hilton',stars:5});
+// var motel1 = new Hotel({ name: 'Motel1',stars:3});
+// var room1 = new Room({number: 1, booked: false, price : 29.5});
+// var room2 = new Room({number: 2, booked: true, price : 30.0,});
+// var hiltonRooms = [room1, room2];
+// hilton.rooms = hiltonRooms;
+// save(hilton);
+// save(motel1);
 
 function save(obj) {
    obj.save(function (err){
@@ -119,19 +121,22 @@ app.delete('/hotels',function (req,res) {
 })
 
 app.post('/hotels', function(req,res){
-   var newHotel = new Hotel({name: req.body.name, stars : req.body.stars});
-   if(req.body.hasOwnProperty('rooms')){
-      var rooms = new Array();
-      for(var room in req.body.rooms){
-         var roomNumber = req.body.rooms[room].number;
-         var roomPrice = req.body.rooms[room].price;
-         var roomBooked = req.body.rooms[room].booked;
-         rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
+   for (var i = 0; i < req.body.hotels.length; i++){
+      var newHotel = new Hotel({name: req.body.hotels[i].name, stars : req.body.hotels[i].stars});
+      if(req.body.hotels[i].hasOwnProperty('rooms')){
+         var rooms = new Array();
+         for(var j=0; j<req.body.hotels[i].rooms.length; j++){
+            console.log(req.body.hotels[i].rooms[j]);
+            var roomNumber = req.body.hotels[i].rooms[j].number;
+            var roomPrice = req.body.hotels[i].rooms[j].price;
+            var roomBooked = req.body.hotels[i].rooms[j].booked;
+            rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
+         }
+         newHotel.rooms = rooms;
       }
-      newHotel.rooms = rooms;
+      save(newHotel);
    }
-   save(newHotel);
-   res.end("Hotel " + req.body.name + " created.");
+   res.end("Hotels created.");
 })
 
 app.delete('/hotels/:name', function (req, res) {
@@ -245,14 +250,14 @@ app.put('/hotels/:name/:number', function(req, res) {
    });
 })
 
-app.get('/orders/',function(req,res){
+app.get('/orders',function(req,res){
    Order.find({}).exec((err, orders) => {
          if (err) return next(err);
          res.json(orders);
    }); 
 })
 
-app.post('/orders/', function(req, res){
+app.post('/orders', function(req, res){
    var hotelName = req.body.hotelName;
    var roomNumber = req.body.roomNumber;
    Hotel.findOne({ name: hotelName}, function(err, hotel) {
@@ -277,7 +282,7 @@ app.post('/orders/', function(req, res){
    })
 })
 
-app.delete('/orders/', function(req, res){
+app.delete('/orders', function(req, res){
    Order.remove({}).exec(); 
    res.end("All orders were successfully removed.")
 })
@@ -309,6 +314,25 @@ app.post('/users',function(req,res){
       save(newUser);
 })
 
+app.get('/offers',function(req,res){
+   Offer.find({}).exec((err, offers) => {
+         if (err) return next(err);
+         res.json(offers);
+   }); 
+})
+
+app.post('/offers', function(req,res){
+   var newOffer = new Offer({hotelName: req.body.hotelName, roomNumber: req.body.roomNumber, startDate: req.body.startDate, endDate: req.body.endDate, discount: req.body.discount});
+   save(newOffer);
+   res.end("New offer created.");
+})
+
+app.get('/offers/:name', function(req,res){
+   Offer.find({hotelName : req.params.name}).exec((err, offers) => {
+      if(err) return next(err);
+      res.json(offers);
+   });
+})
 
 var server = app.listen(8081, function () {
 
