@@ -31,7 +31,7 @@ var locationSchema = mongoose.Schema({
 });
 
 var hotelSchema = mongoose.Schema({
-   hotelName: String,
+   name: String,
    rooms: [roomSchema],
    stars : Number,
    location : locationSchema
@@ -85,7 +85,6 @@ var reservationSchema = mongoose.Schema({
       startDate : String,
       endDate : String
 });
-
 
 var userSchema = mongoose.Schema({
       firstName : String,
@@ -164,7 +163,7 @@ app.delete('/hotels',function (req,res) {
 })
 
 app.post('/hotels', function(req,res){
-   var newHotel = new Hotel({hotelName: req.body.name, stars : req.body.stars});
+   var newHotel = new Hotel({name: req.body.name, stars : req.body.stars});
    if(req.body.hasOwnProperty('rooms')){
       var rooms = new Array();
       for(var room in req.body.rooms){
