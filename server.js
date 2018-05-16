@@ -88,14 +88,14 @@ var Review = mongoose.model('Review', reviewSchema);
 var Offer = mongoose.model('Offer',offerSchema);
 var Bookmark = mongoose.model('Bookmark',bookmarkSchema);
 
-var hilton = new Hotel({ name: 'Hilton',stars:5});
-var motel1 = new Hotel({ name: 'Motel1',stars:3});
-var room1 = new Room({number: 1, booked: false, price : 29.5});
-var room2 = new Room({number: 2, booked: true, price : 30.0,});
-var hiltonRooms = [room1, room2];
-hilton.rooms = hiltonRooms;
-save(hilton);
-save(motel1);
+// var hilton = new Hotel({ name: 'Hilton',stars:5});
+// var motel1 = new Hotel({ name: 'Motel1',stars:3});
+// var room1 = new Room({number: 1, booked: false, price : 29.5});
+// var room2 = new Room({number: 2, booked: true, price : 30.0,});
+// var hiltonRooms = [room1, room2];
+// hilton.rooms = hiltonRooms;
+// save(hilton);
+// save(motel1);
 
 function save(obj) {
    obj.save(function (err){
@@ -165,6 +165,27 @@ app.post('/hotels/:name', function (req, res) {
    });
 })
 
+app.put('/hotels/:name', function (req, res) {
+   Hotel.findOne({name : req.params.name}).exec((err, hotel) => {
+      if(err) return next(err);
+      if(req.body.hasOwnProperty('newRooms')){
+         var rooms = new Array();
+         for(var room in req.body.newRooms){
+            var roomNumber = req.body.newRooms[room].number;
+            var roomPrice = req.body.newRooms[room].price;
+            var roomBooked = req.body.newRooms[room].booked;
+            rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
+         }
+         hotel.set({rooms : rooms})
+         save(hotel);
+      }
+      if(req.body.hasOwnProperty('newStars')){
+         hotel.set({stars : req.body.newStars});
+      }
+      res.end("Hotel updated.");
+   });
+})
+
 app.get('/hotels/:name/:number', function(req, res) {
    Hotel.findOne({ name: req.params.name }, function(err, hotel) {
       if (err) {
@@ -207,12 +228,12 @@ app.put('/hotels/:name/:number', function(req, res) {
       if (hotel) {
          for(var i = 0; i < hotel.rooms.length; i++){
             if(hotel.rooms[i].number == req.params.number){
-               if(req.body.hasOwnProperty('roomPrice')){
-                  hotel.rooms[i].set({price : req.body.roomPrice});
+               if(req.body.hasOwnProperty('newPrice')){
+                  hotel.rooms[i].set({price : req.body.newPrice});
                   save(hotel);
                }
-               if(req.body.hasOwnProperty('roomBooked')){
-                  hotel.rooms[i].set({booked : req.body.roomBooked})
+               if(req.body.hasOwnProperty('newBooked')){
+                  hotel.rooms[i].set({booked : req.body.newBooked})
                   save(hotel);
                }
                res.end("Room updated.");
@@ -259,11 +280,11 @@ app.delete('/orders/', function(req, res){
    res.end("All orders were successfully removed.")
 })
 
-app.get('hotels/stars/:star',function(req,res){
-      Hotel.find({stars : req.params.star}).exec((err, hotel) => {
+app.get('/stars/:stars', function(req,res){
+      Hotel.find({stars : req.params.stars}).exec((err, hotel) => {
             if(err) return next(err);
             res.json(hotel);
-       });
+      });
 })
 
 
