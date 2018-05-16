@@ -28,8 +28,8 @@ var hotelSchema = mongoose.Schema({
 });
 
 var orderSchema = mongoose.Schema({
-    hotel : hotelSchema,
-    room : roomSchema
+   hotel : hotelSchema,
+   room : roomSchema
 });
 
 
@@ -52,7 +52,7 @@ function save(obj) {
    obj.save(function (err){
       if(err) return console.error(err);
       console.log(obj.name + ' saved.');
-   })
+   });
 }
 
 app.get('/hotels', function (req, res) {
@@ -63,27 +63,38 @@ app.get('/hotels', function (req, res) {
 })
 
 app.delete('/hotels',function (req,res) {
-    Hotel.remove({}).exec(); 
-    console.log('All hotels are removed');
+   Hotel.remove({}).exec(); 
+   res.end("All hotels were successfully removed.")
 })
 
 app.post('/hotels', function(req,res){
-    var newHotel = new Hotel({name: req.body.name})
-    console.log(req.body);
-    save(newHotel);
+   var newHotel = new Hotel({name: req.body.name});
+   if(req.body.rooms){
+      var rooms = new Array();
+      for(var room in req.body.rooms){
+         var roomNumber = req.body.rooms[room].number;
+         var roomPrice = req.body.rooms[room].price;
+         var roomBooked = req.body.rooms[room].booked;
+         rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
+      }
+      newHotel.rooms = rooms;
+   }
+   save(newHotel);
+   res.end("Hotel " + req.body.name + " created.");
 })
 
 app.delete('/hotels/:name', function (req, res) {
-    Hotel.remove({name : req.params.name}).exec();
-    console.log('Hotel was deleted , name '+req.params.name);
- })
+   Hotel.remove({name : req.params.name}).exec();
+   console.log('Hotel was deleted , name '+req.params.name);
+   res.end("Hotel " + req.params.name + " was successfully deleted.");
+})
 
- app.get('/hotels/:name', function (req, res) {
-    Hotel.find({name : req.params.name}).exec((err, hotel) => {
-       if(err) return next(err);
-       res.json(hotel);
-    });
- })
+app.get('/hotels/:name', function (req, res) {
+   Hotel.find({name : req.params.name}).exec((err, hotel) => {
+      if(err) return next(err);
+      res.json(hotel);
+   });
+})
 
 app.get('/hotels/:name/:number', function(req, res) {
    Hotel.findOne({ name: req.params.name }, function(err, hotel) {
@@ -101,9 +112,9 @@ app.get('/hotels/:name/:number', function(req, res) {
 });
 
 app.get('/orders/',function(req,res){
-    Order.find({}).exec((err, orders) => {
-        if (err) return next(err);
-        res.json(orders);
+   Order.find({}).exec((err, orders) => {
+         if (err) return next(err);
+         res.json(orders);
       }); 
 });
 
