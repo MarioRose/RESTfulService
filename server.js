@@ -49,11 +49,6 @@ var userSchema = mongoose.Schema({
       password : String
 });
 
-var websiteSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      url : String
-});
-
 var reviewSchema = mongoose.Schema({
       hotelName : String,
       userMail : String,
@@ -68,29 +63,13 @@ var offerSchema = mongoose.Schema({
       discount : String
 });
 
-var bookmarkSchema = mongoose.Schema({
-      user : userSchema,
-      hotel : hotelSchema,
-});
-
-var reservationSchema = mongoose.Schema({
-      hotelName : String,
-      roomNumber : Number,
-      startDate : String,
-      endDate : String
-});
-
 var Hotel = mongoose.model('Hotel', hotelSchema);
 var Room = mongoose.model('Room', roomSchema);
 var Order = mongoose.model('Order',orderSchema);
 var Location = mongoose.model('Location',locationSchema);
 var User = mongoose.model('User',userSchema);
-var Website = mongoose.model('Website',websiteSchema);
 var Review = mongoose.model('Review', reviewSchema);
 var Offer = mongoose.model('Offer',offerSchema);
-var Bookmark = mongoose.model('Bookmark',bookmarkSchema);
-var Reservation = mongoose.model('Reservation',reservationSchema);
-
 
 // var hilton = new Hotel({ name: 'Hilton',stars:5});
 // var motel1 = new Hotel({ name: 'Motel1',stars:3});
