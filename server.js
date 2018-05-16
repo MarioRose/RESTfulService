@@ -19,12 +19,14 @@ db.once('open', function() {
 var roomSchema = mongoose.Schema({
    number : Number,
    booked : Boolean,
-   price : Number
+   price : Number,
+   
 });
 
 var hotelSchema = mongoose.Schema({
    name: String,
-   rooms: [roomSchema]
+   rooms: [roomSchema],
+   stars : Number
 });
 
 var orderSchema = mongoose.Schema({
@@ -32,20 +34,68 @@ var orderSchema = mongoose.Schema({
    roomNumber : Number
 });
 
+var locationSchema = mongoose.Schema({
+      locationName : String,
+      latitude : Number,
+      longitude : Number,
+      Country : String
+});
+
+var userSchema = mongoose.Schema({
+      firstName : String,
+      lastName : String,
+      email : String,
+      password : String
+});
+
+var websiteSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      url : String
+});
+
+var reviewSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      user : userSchema,
+      review : String
+});
+
+var offerSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      room : roomSchema,
+      startDate : String,
+      endDate : String,
+});
+
+var bookmarkSchema = mongoose.Schema({
+      user : userSchema,
+      hotel : hotelSchema,
+});
+
+var reservationSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      room : roomSchema,
+      startDate : String,
+      endDate : String
+});
 
 var Hotel = mongoose.model('Hotel', hotelSchema);
 var Room = mongoose.model('Room', roomSchema);
 var Order = mongoose.model('Order',orderSchema);
+var Location = mongoose.model('Location',locationSchema);
+var User = mongoose.model('User',userSchema);
+var Website = mongoose.model('Website',websiteSchema);
+var Review = mongoose.model('Review', reviewSchema);
+var Offer = mongoose.model('Offer',offerSchema);
+var Bookmark = mongoose.model('Bookmark',bookmarkSchema);
 
-
-// var hilton = new Hotel({ name: 'Hilton'});
-// var motel1 = new Hotel({ name: 'Motel1'});
-// var room1 = new Room({number: 1, booked: false, price : 29.5});
-// var room2 = new Room({number: 2, booked: true, price : 30.0});
-// var hiltonRooms = [room1, room2];
-// hilton.rooms = hiltonRooms;
-// save(hilton);
-// save(motel1);
+var hilton = new Hotel({ name: 'Hilton',stars:5});
+var motel1 = new Hotel({ name: 'Motel1',stars:3});
+var room1 = new Room({number: 1, booked: false, price : 29.5});
+var room2 = new Room({number: 2, booked: true, price : 30.0,});
+var hiltonRooms = [room1, room2];
+hilton.rooms = hiltonRooms;
+save(hilton);
+save(motel1);
 
 function save(obj) {
    obj.save(function (err){
@@ -67,7 +117,7 @@ app.delete('/hotels',function (req,res) {
 })
 
 app.post('/hotels', function(req,res){
-   var newHotel = new Hotel({name: req.body.name});
+   var newHotel = new Hotel({name: req.body.name, stars : req.body.stars});
    if(req.body.hasOwnProperty('rooms')){
       var rooms = new Array();
       for(var room in req.body.rooms){
@@ -208,6 +258,14 @@ app.delete('/orders/', function(req, res){
    Order.remove({}).exec(); 
    res.end("All orders were successfully removed.")
 })
+
+app.get('hotels/stars/:star',function(req,res){
+      Hotel.find({stars : req.params.star}).exec((err, hotel) => {
+            if(err) return next(err);
+            res.json(hotel);
+       });
+})
+
 
 var server = app.listen(8081, function () {
 
