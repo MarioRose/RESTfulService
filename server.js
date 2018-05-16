@@ -55,8 +55,8 @@ var websiteSchema = mongoose.Schema({
 });
 
 var reviewSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      user : userSchema,
+      hotelName : String,
+      userMail : String,
       review : String
 });
 
@@ -317,27 +317,64 @@ app.post('/users',function(req,res){
       if (newUser.firstName == null || newUser.lastName == null || newUser.email == null){
             res.status(400).send("One of the paramters is missing! Bad request");
       }
+      res.json(newUser);
       save(newUser);
 })
 
+app.delete('/users',function(req,res){
+      
+      User.find({email : req.body.email}).exec((err,user)=>{
+            if (user.password == req.body.password){
+                  User.remove({email : req.body.email}).exec();
+            }
+           else{
+                 res.status(401).send("Unauthorized to delete user");
+           }
+
+      });
+     
+})
+
 app.get('/offers',function(req,res){
-   Offer.find({}).exec((err, offers) => {
-         if (err) return next(err);
+      Offer.find({}).exec((err, offers) => {
+            if (err) return next(err);
+            res.json(offers);
+      }); 
+   })
+   
+   app.post('/offers', function(req,res){
+      var newOffer = new Offer({hotelName: req.body.hotelName, roomNumber: req.body.roomNumber, startDate: req.body.startDate, endDate: req.body.endDate, discount: req.body.discount});
+      save(newOffer);
+      res.end("New offer created.");
+   })
+   
+   app.get('/offers/:name', function(req,res){
+      Offer.find({hotelName : req.params.name}).exec((err, offers) => {
+         if(err) return next(err);
          res.json(offers);
-   }); 
+      });
+   })
+
+app.get('/reviews/:name',function(req,res){
+     Review.find({hotelName : req.params.name}).exec((err,review) =>{
+            if(err) return next(err);
+            res.json(review);
+     });
 })
 
-app.post('/offers', function(req,res){
-   var newOffer = new Offer({hotelName: req.body.hotelName, roomNumber: req.body.roomNumber, startDate: req.body.startDate, endDate: req.body.endDate, discount: req.body.discount});
-   save(newOffer);
-   res.end("New offer created.");
-})
+app.post('/reviews',function(req,res){
 
-app.get('/offers/:name', function(req,res){
-   Offer.find({hotelName : req.params.name}).exec((err, offers) => {
-      if(err) return next(err);
-      res.json(offers);
-   });
+      User.find({email : req.body.userMail}).exec((err,user) =>{
+
+            if (user == null){
+                  res.status(401).send("Unauthorized to create review");
+            }
+
+            var newReview = new Review({hotelName : req.body.hotelName, userMail : req.body.userMail, review : req.body.review});
+            res.json(newReview);
+            save(newReview);
+
+      });
 })
 
 app.get('/rating/:rating', function(req,res){
@@ -376,7 +413,6 @@ app.get('/city/:city', function(req, res){
       res.json(matchedHotels);
    });
 })
-
 
 
 var server = app.listen(8081, function () {
