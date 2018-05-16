@@ -23,10 +23,18 @@ var roomSchema = mongoose.Schema({
    
 });
 
+var locationSchema = mongoose.Schema({
+      locationName : String,
+      latitude : Number,
+      longitude : Number,
+      Country : String
+});
+
 var hotelSchema = mongoose.Schema({
-   name: String,
+   hotelName: String,
    rooms: [roomSchema],
-   stars : Number
+   stars : Number,
+   location : locationSchema
 });
 
 var orderSchema = mongoose.Schema({
@@ -78,6 +86,44 @@ var reservationSchema = mongoose.Schema({
       endDate : String
 });
 
+
+var userSchema = mongoose.Schema({
+      firstName : String,
+      lastName : String,
+      email : String,
+      password : String
+});
+
+var websiteSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      url : String
+});
+
+var reviewSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      user : userSchema,
+      review : String
+});
+
+var offerSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      room : roomSchema,
+      startDate : String,
+      endDate : String,
+});
+
+var bookmarkSchema = mongoose.Schema({
+      user : userSchema,
+      hotel : hotelSchema,
+});
+
+var reservationSchema = mongoose.Schema({
+      hotel : hotelSchema,
+      room : roomSchema,
+      startDate : String,
+      endDate : String
+});
+
 var Hotel = mongoose.model('Hotel', hotelSchema);
 var Room = mongoose.model('Room', roomSchema);
 var Order = mongoose.model('Order',orderSchema);
@@ -88,14 +134,15 @@ var Review = mongoose.model('Review', reviewSchema);
 var Offer = mongoose.model('Offer',offerSchema);
 var Bookmark = mongoose.model('Bookmark',bookmarkSchema);
 
-// var hilton = new Hotel({ name: 'Hilton',stars:5});
-// var motel1 = new Hotel({ name: 'Motel1',stars:3});
-// var room1 = new Room({number: 1, booked: false, price : 29.5});
-// var room2 = new Room({number: 2, booked: true, price : 30.0,});
-// var hiltonRooms = [room1, room2];
-// hilton.rooms = hiltonRooms;
-// save(hilton);
-// save(motel1);
+
+var hilton = new Hotel({ name: 'Hilton',stars:5});
+var motel1 = new Hotel({ name: 'Motel1',stars:3});
+var room1 = new Room({number: 1, booked: false, price : 29.5});
+var room2 = new Room({number: 2, booked: true, price : 30.0,});
+var hiltonRooms = [room1, room2];
+hilton.rooms = hiltonRooms;
+save(hilton);
+save(motel1);
 
 function save(obj) {
    obj.save(function (err){
@@ -117,7 +164,7 @@ app.delete('/hotels',function (req,res) {
 })
 
 app.post('/hotels', function(req,res){
-   var newHotel = new Hotel({name: req.body.name, stars : req.body.stars});
+   var newHotel = new Hotel({hotelName: req.body.name, stars : req.body.stars});
    if(req.body.hasOwnProperty('rooms')){
       var rooms = new Array();
       for(var room in req.body.rooms){
@@ -280,11 +327,31 @@ app.delete('/orders/', function(req, res){
    res.end("All orders were successfully removed.")
 })
 
-app.get('/stars/:stars', function(req,res){
+app.get('/stars/:stars',function(req,res){
       Hotel.find({stars : req.params.stars}).exec((err, hotel) => {
             if(err) return next(err);
             res.json(hotel);
-      });
+       });
+})
+
+app.put('/stars/:name',function(req,res){
+      Hotel.find({name : req.params.name}).exec((err, hotel) => {
+            if(err) return next(err);
+            hotel.stars = req.body.stars;
+            res.json(hotel);
+       });
+})
+
+app.post('/users',function(req,res){      
+      var newUser = new User({firstName : req.body.firstName, lastName : req.body.lastName, email : req.body.email, password : req.body.password });
+
+      if(newUser == null || newUser.password == null){
+            res.status(401).send('User creation failed! Unauthorized Error');
+      }
+      if (newUser.firstName == null || newUser.lastName == null || newUser.email == null){
+            res.status(400).send("One of the paramters is missing! Bad request");
+      }
+      save(newUser);
 })
 
 
