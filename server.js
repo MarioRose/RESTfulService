@@ -23,8 +23,15 @@ var roomSchema = mongoose.Schema({
    
 });
 
+var locationSchema = mongoose.Schema({
+      locationName : String,
+      latitude : Number,
+      longitude : Number,
+      Country : String
+});
+
 var hotelSchema = mongoose.Schema({
-   name: String,
+   hotelName: String,
    rooms: [roomSchema],
    stars : Number,
    location : locationSchema
@@ -35,12 +42,7 @@ var orderSchema = mongoose.Schema({
    roomNumber : Number
 });
 
-var locationSchema = mongoose.Schema({
-      locationName : String,
-      latitude : Number,
-      longitude : Number,
-      Country : String
-});
+
 
 var userSchema = mongoose.Schema({
       firstName : String,
@@ -119,7 +121,7 @@ app.delete('/hotels',function (req,res) {
 })
 
 app.post('/hotels', function(req,res){
-   var newHotel = new Hotel({name: req.body.name, stars : req.body.stars});
+   var newHotel = new Hotel({hotelName: req.body.name, stars : req.body.stars});
    if(req.body.hasOwnProperty('rooms')){
       var rooms = new Array();
       for(var room in req.body.rooms){
@@ -199,8 +201,8 @@ app.delete('/orders/', function(req, res){
    res.end("All orders were successfully removed.")
 })
 
-app.get('hotels/stars/:star',function(req,res){
-      Hotel.find({stars : req.params.star}).exec((err, hotel) => {
+app.get('/stars/:stars',function(req,res){
+      Hotel.find({stars : req.params.stars}).exec((err, hotel) => {
             if(err) return next(err);
             res.json(hotel);
        });
