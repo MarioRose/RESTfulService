@@ -96,7 +96,6 @@ app.post('/hotels', function(req,res){
       if(req.body.hotels[i].hasOwnProperty('rooms')){
          var rooms = new Array();
          for(var j=0; j<req.body.hotels[i].rooms.length; j++){
-            console.log(req.body.hotels[i].rooms[j]);
             var roomNumber = req.body.hotels[i].rooms[j].number;
             var roomPrice = req.body.hotels[i].rooms[j].price;
             var roomBooked = req.body.hotels[i].rooms[j].booked;
@@ -151,10 +150,10 @@ app.put('/hotels/:name', function (req, res) {
       if(err) return next(err);
       if(req.body.hasOwnProperty('newRooms')){
          var rooms = new Array();
-         for(var room in req.body.newRooms){
-            var roomNumber = req.body.newRooms[room].number;
-            var roomPrice = req.body.newRooms[room].price;
-            var roomBooked = req.body.newRooms[room].booked;
+         for(var i=0; i<req.body.newRooms.length; i++){
+            var roomNumber = req.body.newRooms[i].number;
+            var roomPrice = req.body.newRooms[i].price;
+            var roomBooked = req.body.newRooms[i].booked;
             rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
          }
          hotel.set({rooms : rooms})
