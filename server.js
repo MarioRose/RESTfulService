@@ -31,11 +31,7 @@ var locationSchema = mongoose.Schema({
 });
 
 var hotelSchema = mongoose.Schema({
-<<<<<<< HEAD
-   hotelName: String,
-=======
    name: String,
->>>>>>> origin/master
    rooms: [roomSchema],
    stars : Number,
    location : locationSchema
@@ -59,24 +55,17 @@ var websiteSchema = mongoose.Schema({
 });
 
 var reviewSchema = mongoose.Schema({
-      hotel : hotelSchema,
-      user : userSchema,
+      hotelName : String,
+      userMail : String,
       review : String
 });
 
 var offerSchema = mongoose.Schema({
-<<<<<<< HEAD
-      hotel : hotelSchema,
-      room : roomSchema,
-      startDate : String,
-      endDate : String,
-=======
       hotelName : String,
       roomNumber : Number,
       startDate : String,
       endDate : String,
       discount : String
->>>>>>> origin/master
 });
 
 var bookmarkSchema = mongoose.Schema({
@@ -86,11 +75,7 @@ var bookmarkSchema = mongoose.Schema({
 
 var reservationSchema = mongoose.Schema({
       hotelName : String,
-<<<<<<< HEAD
-      room : roomSchema,
-=======
       roomNumber : Number,
->>>>>>> origin/master
       startDate : String,
       endDate : String
 });
@@ -104,18 +89,6 @@ var Website = mongoose.model('Website',websiteSchema);
 var Review = mongoose.model('Review', reviewSchema);
 var Offer = mongoose.model('Offer',offerSchema);
 var Bookmark = mongoose.model('Bookmark',bookmarkSchema);
-<<<<<<< HEAD
-
-
-var hilton = new Hotel({ name: 'Hilton',stars:5});
-var motel1 = new Hotel({ name: 'Motel1',stars:3});
-var room1 = new Room({number: 1, booked: false, price : 29.5});
-var room2 = new Room({number: 2, booked: true, price : 30.0,});
-var hiltonRooms = [room1, room2];
-hilton.rooms = hiltonRooms;
-save(hilton);
-save(motel1);
-=======
 var Reservation = mongoose.model('Reservation',reservationSchema);
 
 
@@ -127,20 +100,12 @@ var Reservation = mongoose.model('Reservation',reservationSchema);
 // hilton.rooms = hiltonRooms;
 // save(hilton);
 // save(motel1);
->>>>>>> origin/master
 
 function save(obj) {
    obj.save(function (err){
       if(err) return console.error(err);
       console.log('Object saved.');
    });
-}
-
-function remove(obj){
-      obj.remove(function(err){
-            if(err) return console.error(err);
-            console.log('Object removed');
-      });
 }
 
 app.get('/hotels', function (req, res) {
@@ -156,16 +121,6 @@ app.delete('/hotels',function (req,res) {
 })
 
 app.post('/hotels', function(req,res){
-<<<<<<< HEAD
-   var newHotel = new Hotel({hotelName: req.body.name, stars : req.body.stars});
-   if(req.body.hasOwnProperty('rooms')){
-      var rooms = new Array();
-      for(var room in req.body.rooms){
-         var roomNumber = req.body.rooms[room].number;
-         var roomPrice = req.body.rooms[room].price;
-         var roomBooked = req.body.rooms[room].booked;
-         rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
-=======
    for (var i = 0; i < req.body.hotels.length; i++){
       var newHotel = new Hotel({name: req.body.hotels[i].name, stars : req.body.hotels[i].stars});
       if(req.body.hotels[i].hasOwnProperty('rooms')){
@@ -178,7 +133,6 @@ app.post('/hotels', function(req,res){
             rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
          }
          newHotel.rooms = rooms;
->>>>>>> origin/master
       }
       save(newHotel);
    }
@@ -186,17 +140,12 @@ app.post('/hotels', function(req,res){
 })
 
 app.delete('/hotels/:name', function (req, res) {
-<<<<<<< HEAD
-   Hotel.remove({hotelName : req.params.name}).exec();
-   console.log('Hotel was deleted , name '+req.params.name);
-=======
    Hotel.remove({name : req.params.name}).exec();
->>>>>>> origin/master
    res.end("Hotel " + req.params.name + " was successfully deleted.");
 })
 
 app.get('/hotels/:name', function (req, res) {
-   Hotel.find({hotelName : req.params.name}).exec((err, hotel) => {
+   Hotel.find({name : req.params.name}).exec((err, hotel) => {
       if(err) return next(err);
       res.json(hotel);
    });
@@ -245,7 +194,7 @@ app.put('/hotels/:name', function (req, res) {
 })
 
 app.get('/hotels/:name/:number', function(req, res) {
-   Hotel.findOne({ hotelName: req.params.name }, function(err, hotel) {
+   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
       if (err) {
          console.log("invalid name");
       }
@@ -345,13 +294,6 @@ app.get('/stars/:stars',function(req,res){
        });
 })
 
-app.put('/stars/:name',function(req,res){
-      Hotel.find({name : req.params.name}).exec((err, hotel) => {
-            if(err) return next(err);
-            hotel.stars = req.body.stars;
-            res.json(hotel);
-       });
-})
 
 app.post('/users',function(req,res){      
       var newUser = new User({firstName : req.body.firstName, lastName : req.body.lastName, email : req.body.email, password : req.body.password });
@@ -362,7 +304,6 @@ app.post('/users',function(req,res){
       if (newUser.firstName == null || newUser.lastName == null || newUser.email == null){
             res.status(400).send("One of the paramters is missing! Bad request");
       }
-<<<<<<< HEAD
       res.json(newUser);
       save(newUser);
 })
@@ -377,49 +318,54 @@ app.delete('/users',function(req,res){
                  res.status(401).send("Unauthorized to delete user");
            }
 
-      })
+      });
      
 })
 
-app.get('/reviews',function(req,res){
-      Hotel.find({hotelName : req.body.hotelName}).exec((err,hotel)=>{
-            Review.find({})
-      })
+app.get('/offers',function(req,res){
+      Offer.find({}).exec((err, offers) => {
+            if (err) return next(err);
+            res.json(offers);
+      }); 
+   })
    
+   app.post('/offers', function(req,res){
+      var newOffer = new Offer({hotelName: req.body.hotelName, roomNumber: req.body.roomNumber, startDate: req.body.startDate, endDate: req.body.endDate, discount: req.body.discount});
+      save(newOffer);
+      res.end("New offer created.");
+   })
+   
+   app.get('/offers/:name', function(req,res){
+      Offer.find({hotelName : req.params.name}).exec((err, offers) => {
+         if(err) return next(err);
+         res.json(offers);
+      });
+   })
+
+app.get('/reviews/:name',function(req,res){
+     Review.find({hotelName : req.params.name}).exec((err,review) =>{
+            if(err) return next(err);
+            res.json(review);
+     });
 })
 
 app.post('/reviews',function(req,res){
 
+      User.find({email : req.body.userMail}).exec((err,user) =>{
+
+            if (user == null){
+                  res.status(401).send("Unauthorized to create review");
+            }
+
+            var newReview = new Review({hotelName : req.body.hotelName, userMail : req.body.userMail, review : req.body.review});
+            res.json(newReview);
+            save(newReview);
+
+      });
 })
 
-app.get('/website')
 
 
-=======
-      save(newUser);
-})
-
-app.get('/offers',function(req,res){
-   Offer.find({}).exec((err, offers) => {
-         if (err) return next(err);
-         res.json(offers);
-   }); 
-})
-
-app.post('/offers', function(req,res){
-   var newOffer = new Offer({hotelName: req.body.hotelName, roomNumber: req.body.roomNumber, startDate: req.body.startDate, endDate: req.body.endDate, discount: req.body.discount});
-   save(newOffer);
-   res.end("New offer created.");
-})
-
-app.get('/offers/:name', function(req,res){
-   Offer.find({hotelName : req.params.name}).exec((err, offers) => {
-      if(err) return next(err);
-      res.json(offers);
-   });
-})
-
->>>>>>> origin/master
 var server = app.listen(8081, function () {
 
    var host = server.address().address
