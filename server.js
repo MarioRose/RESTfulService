@@ -208,6 +208,26 @@ app.get('/stars/:stars',function(req,res){
        });
 })
 
+app.put('/stars/:name',function(req,res){
+      Hotel.find({name : req.params.name}).exec((err, hotel) => {
+            if(err) return next(err);
+            hotel.stars = req.body.stars;
+            res.json(hotel);
+       });
+})
+
+app.post('/users',function(req,res){      
+      var newUser = new User({firstName : req.body.firstName, lastName : req.body.lastName, email : req.body.email, password : req.body.password });
+
+      if(newUser == null || newUser.password == null){
+            res.status(401).send('User creation failed! Unauthorized Error');
+      }
+      if (newUser.firstName == null || newUser.lastName == null || newUser.email == null){
+            res.status(400).send("One of the paramters is missing! Bad request");
+      }
+      save(newUser);
+})
+
 
 var server = app.listen(8081, function () {
 
