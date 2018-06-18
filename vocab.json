@@ -69,19 +69,19 @@
             "supportedProperty": []
         },
         {
-            "@id": "http://schema.org/Event",
+            "@id": "http://schema.org/Hotel",
             "@type": "hydra:Class",
-            "hydra:title": "Event",
+            "hydra:title": "Hotel",
             "hydra:description": null,
             "supportedOperation": [
                 {
-                    "@id": "_:event_replace",
+                    "@id": "_:hotel_replace",
                     "@type": "http://schema.org/UpdateAction",
                     "method": "PUT",
-                    "label": "Replaces an existing Event entity",
+                    "label": "Replaces an existing Hotel entity",
                     "description": null,
-                    "expects": "http://schema.org/Event",
-                    "returns": "http://schema.org/Event",
+                    "expects": "http://schema.org/Hotel",
+                    "returns": "http://schema.org/Hotel",
                     "statusCodes": [
                         {
                             "code": 404,
@@ -166,27 +166,27 @@
             "supportedProperty": [
                 {
                     "property": {
-                        "@id": "vocab:EntryPoint/events",
+                        "@id": "vocab:EntryPoint/hotels",
                         "@type": "hydra:Link",
-                        "label": "events",
-                        "description": "The events collection",
+                        "label": "hotels",
+                        "description": "The hotels collection",
                         "domain": "vocab:EntryPoint",
                         "range": "vocab:EventCollection",
                         "supportedOperation": [
                             {
-                                "@id": "_:event_collection_retrieve",
+                                "@id": "_:hotel_collection_retrieve",
                                 "@type": "hydra:Operation",
                                 "method": "GET",
-                                "label": "Retrieves all Event entities",
+                                "label": "Retrieves all Hotel entities",
                                 "description": null,
                                 "expects": null,
-                                "returns": "vocab:EventCollection",
+                                "returns": "vocab:HotelCollection",
                                 "statusCodes": []
                             }
                         ]
                     },
-                    "hydra:title": "events",
-                    "hydra:description": "The events collection",
+                    "hydra:title": "hotels",
+                    "hydra:description": "The hotels collection",
                     "required": null,
                     "readonly": true,
                     "writeonly": false
