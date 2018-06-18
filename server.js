@@ -331,6 +331,10 @@ app.get('/reviews/:name',function(req,res){
      });
 })
 
+app.delete('/reviews',function(req,res){
+      Review.remove({}).exec();
+})
+
 app.post('/reviews',function(req,res){
 
       User.find({email : req.body.userMail}).exec((err,user) =>{
