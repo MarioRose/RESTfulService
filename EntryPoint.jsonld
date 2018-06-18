@@ -1,0 +1,11 @@
+{
+    "@context": {
+        "hydra": "http://www.w3.org/ns/hydra/core#",
+        "vocab": "http://localhost:8081/vocab#",
+        "EntryPoint": "vocab:EntryPoint",
+        "events": {
+            "@id": "vocab:EntryPoint/events",
+            "@type": "@id"
+        }
+    }
+}
