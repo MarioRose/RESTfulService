@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 var fs = require("fs");
 var parser = require("body-parser");
+var path=require('path');
+app.use(express.static(path.join('/','public')));
 
 app.use(parser.json());
 app.use(parser.urlencoded({extended:true}));
@@ -77,6 +79,10 @@ function save(obj) {
       console.log('Object saved.');
    });
 }
+
+app.get('/hotels-api', function(req, res){
+   res.end('{"@context": "/EntryPoint.jsonld","@id": "/hotels-api/","@type": "EntryPoint","hotels": "/hotels/"}');
+})
 
 app.get('/hotels', function (req, res) {
     Hotel.find({}).exec((err, hotels) => {
