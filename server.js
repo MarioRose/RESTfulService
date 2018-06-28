@@ -3,7 +3,10 @@ var app = express();
 var fs = require("fs");
 var parser = require("body-parser");
 var path=require('path');
-app.use(express.static(path.join('/','public')));
+var jsonld = require("jsonld");
+
+
+app.use(express.static(path.resolve('./')));
 
 app.use(parser.json());
 app.use(parser.urlencoded({extended:true}));
@@ -80,8 +83,25 @@ function save(obj) {
    });
 }
 
+var doc = {
+      "http://schema.org/name": "Manu Sporny",
+      "http://schema.org/url": {"@id": "http://manu.sporny.org/"},
+      "http://schema.org/image": {"@id": "http://manu.sporny.org/images/manu.png"}
+    };
+    var context = {
+      "name": "http://schema.org/EntryPoint",
+      "homepage": {"@id": "http://schema.org/url", "@type": "@id"},
+      "image": {"@id": "http://schema.org/image", "@type": "@id"}
+    };
+
 app.get('/hotels-api', function(req, res){
-   res.end('{"@context": "/EntryPoint.jsonld","@id": "/hotels-api/","@type": "EntryPoint","hotels": "/hotels/"}');
+   res.setHeader('Content-Type', 'application/json');
+   jsonld.compact(doc, context, function(err, compacted) {
+      console.log(JSON.stringify(compacted, null, 2));
+      res.end(JSON.stringify(compacted,  null, 2));
+   });
+   res.end('{"@context" : "/EntryPoint.jsonld" , "@id": "/hotels-api/","@type": "EntryPoint","hotels": "/hotels/"}');
+
 })
 
 app.get('/hotels', function (req, res) {
