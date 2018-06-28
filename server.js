@@ -87,16 +87,6 @@ function save(obj) {
    });
 }
 
-app.get('/hotel-api' , function(req,res){
-   var reader = new FileReader();
-  reader.onload = function(e) {
-    var contents = e.target.result;
-    // Display file content
-    displayContents(contents);
-  };
-   res.end('index.html')
-});
-
 app.get('/', function(req, res){
    res.setHeader('Content-Type', 'application/json');
    response = {};
