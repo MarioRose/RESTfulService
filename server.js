@@ -83,24 +83,66 @@ function save(obj) {
    });
 }
 
-var doc = {
-      "http://schema.org/name": "Manu Sporny",
-      "http://schema.org/url": {"@id": "http://manu.sporny.org/"},
-      "http://schema.org/image": {"@id": "http://manu.sporny.org/images/manu.png"}
+var docApi = {
+      "@type" :"WebAPI",
+      "documentation":{
+      "potentialAction": [
+            {
+              "@type": "SearchAction",
+              "name" : "room",
+              "target": "http://127.0.0.1:8081/rooms?hotel={hotelid}",
+              "url-input": [
+                "name=hotel"
+              ]
+            },
+            {
+            "@type" : "CreateAction",
+            "target" :"http://127.0.0.1:81081/hotels",
+            "url-input": [
+                  "required name=name",
+                  "required name=stars",
+                  "required name=rating"
+                ]
+            },
+            {
+                  "@type" :"SearchAction",
+                  "target" : "127.0.0.1:8081/hotels"
+
+            },
+            {
+                  "@type": "SearchAction",
+                  "target": "http://127.0.0.1:8081/hotels/hotel={hotelid}",
+                  "url-input": [
+                    "required name=hotel"
+                  ]
+            },
+            {
+                  "@type" : "SearchAction",
+                  "target" : "http://127.0.0.1:8081/orders"
+            },
+            {
+                  "@type" : "OrderAction",
+                  "target": "http://127.0.0.1:8081/orders",
+                  "url-input": [
+                        "required "
+                  ]
+            },
+           
+
+          ]
+      }
     };
-    var context = {
-      "name": "http://schema.org/EntryPoint",
-      "homepage": {"@id": "http://schema.org/url", "@type": "@id"},
-      "image": {"@id": "http://schema.org/image", "@type": "@id"}
+    var contextApi = {
+      "@context": "http://schema.org"
+      
     };
 
 app.get('/hotels-api', function(req, res){
    res.setHeader('Content-Type', 'application/json');
-   jsonld.compact(doc, context, function(err, compacted) {
+   jsonld.compact(docApi, contextApi, function(err, compacted) {
       console.log(JSON.stringify(compacted, null, 2));
       res.end(JSON.stringify(compacted,  null, 2));
    });
-   res.end('{"@context" : "/EntryPoint.jsonld" , "@id": "/hotels-api/","@type": "EntryPoint","hotels": "/hotels/"}');
 
 })
 
