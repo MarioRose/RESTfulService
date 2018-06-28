@@ -1,15 +1,22 @@
 <html>
 	<head>
 		<title>Request Example</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	</head>
 	<body>
+		<div style="float:left; width:50%">
 		<h1>Hotel API Web Client</h1>
 		<h2>Get all hotels</h2>
-		<form method="GET" action="/hotels">
-			<input type="submit">
+		<form method="GET" action="/hotels" id="get-hotels-form">
+			<input type="submit" id="get-hotels-button">
+		</form>
+		<h2>Get hotel by Id</h2>
+		<form method="GET" action="/hotels" id="get-hotel-by-id-form">
+			Insert hotel id : <input type="text" id="hotel-id">
+			<input type="submit" id="get-hotel-by-id-button">
 		</form>
 		<h2>Create a hotel</h2>
-		<form method="POST" action="/hotels">
+		<form method="POST" action="/hotels" id="post-form">
 			Insert name for a hotel : <input type="text" name="name">
 			Insert stars for a hotel : <input type="number" name="stars">
 			Insert ratings for a hotel : <input type="number" name="ratings">
@@ -17,28 +24,80 @@
 			Insert latitude for a hotel : <input type="number" name="latitude">
 			Insert longitude for a hotel : <input type="number" name="longitude">
 			Insert country for a hotel : <input type="text" name="countryName">
-			<input type="submit">
+			<input type="submit" id="post-button">
 		</form>
 
 		<h2>Delete one hotel</h2>
 		<form method="DELETE" action="/hotels/:id">
 			<input type="submit">
 		</form>
-
-		<h2>Create an Event</h2>
-		<form method ="POST" action="/create">
-		Create an event name : <input type="text" name="name">
-		Description of event : <input type="text" name="description">
-		Insert starttime: <input type="text" name="starttime">
-		Insert timezone: <input type="text" name="timezone">
-		Insert endtime: <input type="text" name="endtime">
-		Insert currency: <input type="text" name="currency">
-		<input type="submit">
-		</form>
-		<h2>Delete an event</h2>
-		<form method="POST" action="/delete">
-			Insert id for a event : <input type="text" name="id">
-			<input type="submit">
-		</form>
+	</div>
+	<div style="float:left; width:50%" id="json">
+	</div>
 	</body>
+
+	<script>
+	$(document).ready(function(){
+
+  	$('#get-hotels-button').on('click', function(e) {
+    	e.preventDefault();
+    	$.ajax({
+      		type: "GET",
+      		url: $("#get-hotels-form").attr('action'),
+      		success: function(response) {
+        		console.log(response);
+        		$('#json').text(JSON.stringify(response));
+      		}
+    		});
+    	return false;
+  		});
+
+  	$('#get-hotel-by-id-button').on('click', function(e) {
+  		e.preventDefault();
+  		var requestUrl = $("#get-hotel-by-id-form").attr('action') + '/' + $("#hotel-id").val();
+  		console.log(requestUrl);
+  		$.ajax({
+  			type: "GET",
+  			url: requestUrl,
+  			success: function(response) {
+  				console.log(response);
+  				$('#json').text(JSON.stringify(response));
+  			}
+  		})
+  	})
+
+  	$('#post-button').on('click', function(e) {
+    	e.preventDefault();
+    	$.ajax({
+      		type: "POST",
+      		url: $("#post-form").attr('action'),
+      		data: $("#post-form").serialize(),
+      		success: function(response) {
+        		console.log(response);
+        		$('#json').text(response);
+      		}
+    		});
+    		return false;
+  		});
+	})
+
+	function json2table(json, classes) {
+  		var cols = Object.keys(json[0]);
+		var headerRow = '';
+		var bodyRows = '';
+		classes = classes || '';
+		cols.map(function(col) {
+  			headerRow += '<th>' + capitalizeFirstLetter(col) + '</th>';
+		});
+		json.map(function(row) {
+  			bodyRows += '<tr>';
+
+  			bodyRows += '</tr>';
+		}
+	}
+
+	function capitalizeFirstLetter(string) {
+  		return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+</script>
 </html>
