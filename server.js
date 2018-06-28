@@ -3,7 +3,6 @@ var app = express();
 var fs = require("fs");
 var parser = require("body-parser");
 var path=require('path');
-var jsonld = require("jsonld");
 
 
 app.use(express.static(path.resolve('./')));
@@ -14,6 +13,8 @@ app.use(parser.urlencoded({extended:true}));
 var mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost:27017');
+
+var host = "localhost:8081/"
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -86,7 +87,7 @@ function save(obj) {
    });
 }
 
-app.get('/' , function(req,res){
+app.get('/hotel-api' , function(req,res){
    var reader = new FileReader();
   reader.onload = function(e) {
     var contents = e.target.result;
@@ -94,10 +95,245 @@ app.get('/' , function(req,res){
     displayContents(contents);
   };
    res.end('index.html')
-})
+};
 
-app.get('/hotels-api', function(req, res){
+app.get('/', function(req, res){
    res.setHeader('Content-Type', 'application/json');
+   response = {};
+   response["@context"] = "http://schema.org"
+   response["@type"] = "WebAPI"
+   response["documentation"] = {};
+   response["documentation"]["@type"] = "CreativeWork";
+   response["documentation"]["hasPart"] = new Array();
+
+   room = {};
+   room["@type"] = "CreativeWork";
+   room["name"] = "room";
+
+   getRooms = {};
+   getRooms["@type"] = "SearchAction";
+   getRooms["target"] = host + "rooms?hotel={hotelid}";
+   getRooms["url-input"] = new Array("name=hotel");
+
+   room["potentialAction"] = new Array(getRooms);
+
+   hotel = {};
+   hotel["@type"] = "CreativeWork";
+   hotel["name"] = "hotel";
+   hotel["potentialAction"] = new Array();
+
+   postHotel = {};
+   postHotel["@type"] = "CreateAction";
+   postHotel["target"] = host + "hotel?user={userId}&key={keyString}&location={locationId}&rooms={roomsString}&stars={starsNumber}&price={priceString}&name={nameString}";
+   postHotel["url-input"] = new Array();
+   postHotel["url-input"].push("required name=user");
+   postHotel["url-input"].push("required name=key");
+   postHotel["url-input"].push("required name=location");
+   postHotel["url-input"].push("required name=rooms");
+   postHotel["url-input"].push("required name=stars");
+   postHotel["url-input"].push("required name=price");
+   postHotel["url-input"].push("required name=name");
+
+   getHotel = {};
+   getHotel["@type"] = "SearchAction";
+   getHotel["target"] = host + "hotel?hotel={hotelid}"
+   getHotel["url-input"] = new Array("required name=hotel");
+
+   getHotels = {};
+   getHotels["@type"] = "SearchAction";
+   getHotels["target"] = host + "hotels?location={locationId}&distance={distanceNumber}";
+   getHotels["url-input"] = new Array();
+   getHotels["url-input"].push("name=location")
+   getHotels["url-input"].push("name=distance")
+
+   updateHotel = {};
+   updateHotel["@type"] = "UpdateAction";
+   updateHotel["target"] = host + "hotels?hotel={hotelId}&user={userId}&key={keyString}&stars={starsNumber}";
+   updateHotel["url-input"] = new Array();
+   updateHotel["url-input"].push("required name=hotel");
+   updateHotel["url-input"].push("required name=user");
+   updateHotel["url-input"].push("required name=key");
+   updateHotel["url-input"].push("required name=stars");
+
+   deleteHotel = {};
+   deleteHotel["@type"] = "DeleteAction";
+   deleteHotel["target"] = host + "hotels?hotel={hotelId}&user={userId}&key={keyString}";
+   deleteHotel["url-input"] = new Array();
+   deleteHotel["url-input"].push("required name=hotel");
+   deleteHotel["url-input"].push("required name=user");
+   deleteHotel["url-input"].push("required name=key");
+
+   deleteHotels = {};
+   deleteHotels["@type"] = "DeleteAction";
+   deleteHotels["target"] = host + "hotels";
+
+   hotel["potentialAction"].push(postHotel);
+   hotel["potentialAction"].push(getHotel);
+   hotel["potentialAction"].push(getHotels);
+   hotel["potentialAction"].push(updateHotel);
+   hotel["potentialAction"].push(deleteHotel);
+   hotel["potentialAction"].push(deleteHotels);
+
+   user = {};
+   user["@type"] = "CreativeWork";
+   user["name"] = "user";
+   user["potentialAction"] = new Array();
+
+   postUser = {};
+   postUser["@type"] = "CreateAction";
+   postUser["target"] = host + "user?firstname={firstName}&lastname={lastName}&email={emailString}&creator={creatorBool}&passkey={keyString}&user={creatorId}&user_key={creatorKeyString}";
+   postUser["url-input"] = new Array();
+   postUser["url-input"].push("required name=firstname");
+   postUser["url-input"].push("required name=lastname");
+   postUser["url-input"].push("required name=email");
+   postUser["url-input"].push("required name=creator");
+   postUser["url-input"].push("required name=passkey");
+   postUser["url-input"].push("required name=user");
+   postUser["url-input"].push("required name=key");
+
+   deleteUser = {};
+   deleteUser["@type"] = "DeleteAction";
+   deleteUser["target"] = host + "user?user1={creatorId}&user2={userId}&key={creatorKey}";
+   deleteUser["url-input"] = new Array();
+   deleteUser["url-input"].push("required name=user1");
+   deleteUser["url-input"].push("required name=user2");
+   deleteUser["url-input"].push("required name=key");
+
+   updateUser = {};
+   updateUser["@type"] = "UpdateAction";
+   updateUser["target"] = host + "user?firstname={firstName}&lastname={lastName}&email={emailString}&creator={creatorBool}&passkey={keyString}&user1={creatorId}&user2={userId}&user_key={creatorKeyString}";
+   updateUser["url-input"] = new Array();
+   updateUser["url-input"].push("required name=firstname");
+   updateUser["url-input"].push("required name=lastname");
+   updateUser["url-input"].push("required name=email");
+   updateUser["url-input"].push("required name=creator");
+   updateUser["url-input"].push("required name=passkey");
+   updateUser["url-input"].push("required name=user1");
+   updateUser["url-input"].push("required name=user2");
+   updateUser["url-input"].push("required name=key");
+
+   user["potentialAction"].push(postUser);
+   user["potentialAction"].push(deleteUser);
+   user["potentialAction"].push(updateUser);
+
+   location = {};
+   location["@type"] = "CreativeWork";
+   location["name"] = "Location";
+   location["potentialAction"] = new Array();
+
+   createLocation = {};
+   createLocation["@type"] = "CreateAction";
+   createLocation["target"] = host + "location?location={locationName}&lat={latitude}&lon={longitude}&country={countryString}";
+   createLocation["url-input"] = new Array();
+   createLocation["url-input"].push("required name=location");
+   createLocation["url-input"].push("required name=lat");
+   createLocation["url-input"].push("required name=lon");
+   createLocation["url-input"].push("required name=country");
+
+   searchLocations = {};
+   searchLocations["@type"] = "SearchAction";
+   searchLocations["target"] = "localhost:8081/locations";
+
+   searchLocation = {};
+   searchLocation["@type"] = "SearchAction";
+   searchLocation["target"] = host + "location?hotel={hotelId}";
+   searchLocation["url-input"] = new Array();
+   searchLocation["url-input"].push("required name=hotel");
+
+   deleteLocation = {};
+   deleteLocation["@type"] = "DeleteAction";
+   deleteLocation["target"] = host + "location?location={locationId}";
+   deleteLocation["url-input"] = new Array();
+   deleteLocation["url-input"].push("required name=location");
+
+   location["potentialAction"].push(createLocation);
+   location["potentialAction"].push(searchLocations);
+   location["potentialAction"].push(searchLocation);
+   location["potentialAction"].push(deleteLocation);
+
+   review = {};
+   review["@type"] = "CreativeWork";
+   review["name"] = "Review";
+   review["potentialAction"] = new Array();
+
+   createReview = {};
+   createReview["@type"] = "CreateAction";
+   createReview["target"] = host + "review?hotel={hotelId}&msg={msgString}&user={creatorId}&key={keyString}";
+   createReview["url-input"] = new Array();
+   createReview["url-input"].push("required name=hotel");
+   createReview["url-input"].push("required name=msg");
+   createReview["url-input"].push("required name=user");
+   createReview["url-input"].push("required name=key");
+
+   searchReview = {};
+   searchReview["@type"] = "SearchAction";
+   searchReview["target"] = host + "reviews?hotel={hotelId}";
+   searchReview["url-input"] = new Array();
+   searchReview["url-input"].push("name=hotel");
+
+   review["potentialAction"].push(createReview);
+   review["potentialAction"].push(searchReview);
+
+   order = {};
+   order["@type"] = "CreativeWork";
+   order["name"] = "Order";
+   order["potentialAction"] = new Array();
+
+   createOrder = {};
+   createOrder["@type"] = "CreateAction";
+   createOrder["target"] = host + "booking?hotel={hotelId}&user={creatorId}&key={keyString}&room={roomId}&start={startDate}&end={endDate}";
+   createOrder["url-input"] = new Array();
+   createOrder["url-input"].push("required name=hotel");
+   createOrder["url-input"].push("required name=user");
+   createOrder["url-input"].push("required name=key");
+   createOrder["url-input"].push("required name=room");
+   createOrder["url-input"].push("required name=start");
+   createOrder["url-input"].push("required name=end");
+
+   searchOrders = {};
+   searchOrders["@type"] = "SearchAction";
+   searchOrders["target"] = host + "bookings?room={userId}";
+   searchOrders["url-input"] = new Array();
+   searchOrders["url-input"].push("name=user");
+
+   deleteOrder = {};
+   deleteOrder["@type"] = "DeleteAction";
+   deleteOrder["target"] = host + "reservation?booker={bookerId}&booking={bookingId}&user={creatorId}&key={keyString}";
+   deleteOrder["url-input"] = new Array();
+   deleteOrder["url-input"].push("required name=booker");
+   deleteOrder["url-input"].push("required name=booking");
+   deleteOrder["url-input"].push("required name=user");
+   deleteOrder["url-input"].push("required name=key");
+
+   order["potentialAction"].push(createOrder);
+   order["potentialAction"].push(searchOrders);
+   order["potentialAction"].push(deleteOrder);
+
+   offer = {};
+   offer["@type"] = "CreativeWork";
+   offer["name"] = "Offer";
+   offer["potentialAction"] = new Array();
+
+   searchOffer = {};
+   searchOffer["@type"] = "SearchAction";
+   searchOffer["target"] = host + "offer?hotel={hotelId}&room={roomId}&start={startDate}&end={endDate}";
+   searchOffer["url-input"] = new Array();
+   searchOffer["url-input"].push("required name=hotel");
+   searchOffer["url-input"].push("required name=room");
+   searchOffer["url-input"].push("required name=start");
+   searchOffer["url-input"].push("required name=end");
+
+   offer["potentialAction"].push(searchOffer)
+
+   response["documentation"]["hasPart"].push(room);
+   response["documentation"]["hasPart"].push(hotel);
+   response["documentation"]["hasPart"].push(user);
+   response["documentation"]["hasPart"].push(location);
+   response["documentation"]["hasPart"].push(review);
+   response["documentation"]["hasPart"].push(order);
+   response["documentation"]["hasPart"].push(offer);
+
+   res.end(JSON.stringify(response));
 })
 
 app.get('/hotels', function (req, res) {
@@ -392,7 +628,6 @@ app.delete('/users',function(req,res){
            }
 
       });
-     
 })
 
 app.get('/offers',function(req,res){
