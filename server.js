@@ -490,8 +490,8 @@ app.get('/hotels/:id', function (req, res) {
 })
 
 
-app.post('/hotels/:name', function (req, res) {
-   Hotel.findOne({name : req.params.name}).exec((err, hotel) => {
+app.post('/hotels/:id', function (req, res) {
+   Hotel.findOne({_id : req.params.id}).exec((err, hotel) => {
       if(err) return next(err);
       for(var i=0; i<hotel.rooms.length; i++){
          if(hotel.rooms[i].number == req.body.roomNumber){
@@ -511,8 +511,8 @@ app.post('/hotels/:name', function (req, res) {
    });
 })
 
-app.put('/hotels/:name', function (req, res) {
-   Hotel.findOne({name : req.params.name}).exec((err, hotel) => {
+app.put('/hotels/:id', function (req, res) {
+   Hotel.findOne({_id : req.params.id}).exec((err, hotel) => {
       if(err) return next(err);
       if(req.body.hasOwnProperty('newRooms')){
          var rooms = new Array();
@@ -535,8 +535,8 @@ app.put('/hotels/:name', function (req, res) {
    });
 })
 
-app.get('/hotels/:name/:number', function(req, res) {
-   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
+app.get('/hotels/:id/:number', function(req, res) {
+   Hotel.findOne({ _id: req.params.id }, function(err, hotel) {
       if (err) {
          console.log("invalid name");
       }
@@ -550,8 +550,8 @@ app.get('/hotels/:name/:number', function(req, res) {
    });
 })
 
-app.delete('/hotels/:name/:number', function(req, res) {
-   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
+app.delete('/hotels/:id/:number', function(req, res) {
+   Hotel.findOne({ _id: req.params.id }, function(err, hotel) {
       if (err) {
          console.log("invalid name");
       }
@@ -569,8 +569,8 @@ app.delete('/hotels/:name/:number', function(req, res) {
    });
 })
 
-app.put('/hotels/:name/:number', function(req, res) {
-   Hotel.findOne({ name: req.params.name }, function(err, hotel) {
+app.put('/hotels/:id/:number', function(req, res) {
+   Hotel.findOne({ _id: req.params.id }, function(err, hotel) {
       if (err) {
          console.log("invalid name");
       }
