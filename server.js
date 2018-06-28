@@ -43,6 +43,7 @@ var hotelSchema = mongoose.Schema({
 });
 
 var orderSchema = mongoose.Schema({
+   hotelId : String,
    hotelName : String,
    roomNumber : Number
 });
@@ -55,12 +56,14 @@ var userSchema = mongoose.Schema({
 });
 
 var reviewSchema = mongoose.Schema({
+      hotelId : String,
       hotelName : String,
       userMail : String,
       review : String
 });
 
 var offerSchema = mongoose.Schema({
+      hotelId : String,
       hotelName : String,
       roomNumber : Number,
       startDate : String,
@@ -83,6 +86,16 @@ function save(obj) {
    });
 }
 
+app.get('/' , function(req,res){
+   var reader = new FileReader();
+  reader.onload = function(e) {
+    var contents = e.target.result;
+    // Display file content
+    displayContents(contents);
+  };
+   res.end('index.html')
+})
+
 app.get('/hotels-api', function(req, res){
    res.setHeader('Content-Type', 'application/json');
 })
@@ -98,13 +111,21 @@ app.get('/hotels', function (req, res) {
                   hotelDictionary["@context"] = "http://schema.org";
                   hotelDictionary["@type"] = "Hotel";
                   hotelDictionary["name"] = hotels[i].name;
-                  hotelDictionary["location"] = hotels[i].location;
+                  location = {};
+                  location["@type"] = "SearchAction";
+                  location["City"] = hotels[i].location["City"];
+                  location["_id"] = hotels[i].location["_id"];
+                  location["name"] = "http://localhost:8081/city/"+hotels[i].location["cityName"];
+                  location["latitude"] =  hotels[i].location["latitude"];
+                  location["longitude"] =  hotels[i].location["longitude"];
+                  location["Country"] =  hotels[i].location["country"];
                   hotelDictionary["potentialAction"]= new Array();
                   getHotel = {};
                   getHotel["@type"] = "SearchAction";
-                  getHotel["name"] = "hotel";
-                  getHotel["query"] = "http://localhost:8081/hotels"+hotels[i]["_id"];
+                  getHotel["name"] = hotels[i].name;
+                  getHotel["query"] = "http://localhost:8081/hotels/"+hotels[i]["_id"];
                   hotelDictionary["potentialAction"].push(getHotel);
+                  hotelDictionary["potentialAction"].push(location);
                   hotelResult.push(hotelDictionary);
 
                   };
@@ -119,6 +140,25 @@ app.delete('/hotels',function (req,res) {
 })
 
 app.post('/hotels', function(req,res){
+   if(!req.body.hasOwnProperty("hotels")){
+       var newHotel = new Hotel({name: req.body.name, stars : req.body.stars, rating: req.body.rating});
+      if(req.body.hasOwnProperty('rooms')){
+         var rooms = new Array();
+         for(var j=0; j<req.body.rooms.length; j++){
+            var roomNumber = req.body.rooms[j].number;
+            var roomPrice = req.body.rooms[j].price;
+            var roomBooked = req.body.rooms[j].booked;
+            rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
+         }
+         newHotel.rooms = rooms;
+      }
+         var location = new Location({cityName: req.body.cityName, 
+            latitude: req.body.latitude, longitude: req.body.longitude, 
+            country: req.body.countryName});
+         newHotel.location = location;
+         console.log(newHotel.name);
+      save(newHotel);
+   }else {
    for (var i = 0; i < req.body.hotels.length; i++){
       var newHotel = new Hotel({name: req.body.hotels[i].name, stars : req.body.hotels[i].stars, rating: req.body.hotels[i].rating});
       if(req.body.hotels[i].hasOwnProperty('rooms')){
@@ -136,21 +176,44 @@ app.post('/hotels', function(req,res){
             country: req.body.hotels[i].countryName});
          newHotel.location = location;
       save(newHotel);
-   }
+   }}
    res.end("Hotels created.");
 })
 
-app.delete('/hotels/:name', function (req, res) {
-   Hotel.remove({name : req.params.name}).exec();
+app.delete('/hotels/:id', function (req, res) {
+   Hotel.remove({_id : req.params.id}).exec();
    res.end("Hotel " + req.params.name + " was successfully deleted.");
 })
 
-app.get('/hotels/:name', function (req, res) {
-   Hotel.find({name : req.params.name}).exec((err, hotel) => {
+app.get('/hotels/:id', function (req, res) {
+   Hotel.find({_id : req.params.id}).exec((err, hotels) => {
       if(err) return next(err);
-      res.json(hotel);
+      hotelResult = new Array();
+            for(var i = 0; i<hotels.length; i++){
+                  
+                  hotelDictionary = {};
+                  hotelDictionary["@context"] = "http://schema.org";
+                  hotelDictionary["@type"] = "Hotel";
+                  hotelDictionary["name"] = hotels[i].name;
+                  hotelDictionary["starRating"] = hotels[i].stars;
+                  hotelDictionary["location"] = hotels[i].location;
+                  hotelDictionary["potentialAction"]= new Array();
+                  bookRoom = {};
+                  bookRoom["@type"] = "OrderAction";
+                  bookRoom["rooms"] = new Array();
+                  for(var j = 0; j < hotels[i].rooms.length; j++){
+                     var room = hotels[i].rooms[j];
+                     bookRoom["rooms"].push(room);
+               };
+                  hotelDictionary["potentialAction"].push(bookRoom);
+                  hotelResult.push(hotelDictionary);
+
+                  };
+            res.json(hotelResult);
+      
    });
 })
+
 
 app.post('/hotels/:name', function (req, res) {
    Hotel.findOne({name : req.params.name}).exec((err, hotel) => {
@@ -170,7 +233,7 @@ app.post('/hotels/:name', function (req, res) {
       hotel.set({rooms: newRooms});
       save(hotel);
       res.end("New room was successfully created.");
-   });hotels
+   });
 })
 
 app.put('/hotels/:name', function (req, res) {
@@ -262,9 +325,9 @@ app.get('/orders',function(req,res){
 })
 
 app.post('/orders', function(req, res){
-   var hotelName = req.body.hotelName;
+   var hotelId = req.body.hotelId;
    var roomNumber = req.body.roomNumber;
-   Hotel.findOne({ name: hotelName}, function(err, hotel) {
+   Hotel.findOne({ _id: hotelId}, function(err, hotel) {
       if (err) {
          console.log("invalid name");
       }
@@ -291,8 +354,8 @@ app.delete('/orders', function(req, res){
    res.end("All orders were successfully removed.")
 })
 
-app.get('/orders/:name', function(req, res){
-   Order.find({hotelName : req.params.name}).exec((err, orders) => {
+app.get('/orders/:id', function(req, res){
+   Order.find({_id : req.params.id}).exec((err, orders) => {
             if(err) return next(err);
             res.json(orders);
    });
@@ -352,8 +415,8 @@ app.get('/offers',function(req,res){
       });
    })
 
-app.get('/reviews/:name',function(req,res){
-     Review.find({hotelName : req.params.name}).exec((err,review) =>{
+app.get('/reviews/:id',function(req,res){
+     Review.find({hotelName : req.params.id}).exec((err,review) =>{
             if(err) return next(err);
             res.json(review);
      });

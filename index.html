@@ -1,0 +1,44 @@
+<html>
+	<head>
+		<title>Request Example</title>
+	</head>
+	<body>
+		<h1>Hotel API Web Client</h1>
+		<h2>Get all hotels</h2>
+		<form method="GET" action="/hotels">
+			<input type="submit">
+		</form>
+		<h2>Create a hotel</h2>
+		<form method="POST" action="/hotels">
+			Insert name for a hotel : <input type="text" name="name">
+			Insert stars for a hotel : <input type="number" name="stars">
+			Insert ratings for a hotel : <input type="number" name="ratings">
+			Insert location for a hotel : <input type="text" name="booked">
+			Insert latitude for a hotel : <input type="number" name="latitude">
+			Insert longitude for a hotel : <input type="number" name="longitude">
+			Insert country for a hotel : <input type="text" name="countryName">
+			<input type="submit">
+		</form>
+
+		<h2>Delete one hotel</h2>
+		<form method="DELETE" action="/hotels/:id">
+			<input type="submit">
+		</form>
+
+		<h2>Create an Event</h2>
+		<form method ="POST" action="/create">
+		Create an event name : <input type="text" name="name">
+		Description of event : <input type="text" name="description">
+		Insert starttime: <input type="text" name="starttime">
+		Insert timezone: <input type="text" name="timezone">
+		Insert endtime: <input type="text" name="endtime">
+		Insert currency: <input type="text" name="currency">
+		<input type="submit">
+		</form>
+		<h2>Delete an event</h2>
+		<form method="POST" action="/delete">
+			Insert id for a event : <input type="text" name="id">
+			<input type="submit">
+		</form>
+	</body>
+</html>
