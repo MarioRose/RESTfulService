@@ -634,9 +634,38 @@ app.get('/orders/:id', function(req, res){
 })
 
 app.get('/stars/:stars',function(req,res){
-      Hotel.find({stars : req.params.stars}).exec((err, hotel) => {
+      Hotel.find({stars : req.params.stars}).exec((err, hotels) => {
             if(err) return next(err);
-            res.json(hotel);
+            hotelResult = new Array();
+            for(var i = 0; i<hotels.length; i++){
+                  
+                  starDictionary = {};
+                  starDictionary["@context"] = "http://schema.org";
+                  starDictionary["@type"] = "Hotel";
+                  starDictionary["name"] = hotels[i].name;
+                  starDictionary["starRating"] = hotels[i].stars;
+                  location = {};
+                  location["@type"] = "SearchAction";
+                  location["City"] = hotels[i].location["City"];
+                  location["_id"] = hotels[i].location["_id"];
+                  location["name"] = "http://localhost:8081/city/"+hotels[i].location["cityName"];
+                  location["latitude"] =  hotels[i].location["latitude"];
+                  location["longitude"] =  hotels[i].location["longitude"];
+                  location["Country"] =  hotels[i].location["country"];
+                  starDictionary["potentialAction"]= new Array();
+                  bookRoom = {};
+                  bookRoom["@type"] = "OrderAction";
+                  bookRoom["rooms"] = new Array();
+                  for(var j = 0; j < hotels[i].rooms.length; j++){
+                     var room = hotels[i].rooms[j];
+                     bookRoom["rooms"].push(room);
+               };
+                  starDictionary["potentialAction"].push(location);
+                  starDictionary["potentialAction"].push(bookRoom);
+                  hotelResult.push(starDictionary);
+
+                  };
+            res.json(hotelResult);
        });
 })
 
