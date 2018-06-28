@@ -46,7 +46,7 @@
       		url: $("#get-hotels-form").attr('action'),
       		success: function(response) {
         		console.log(response);
-        		$('#json').text(JSON.stringify(response));
+        		$('#json').text(json2table(response));
       		}
     		});
     	return false;
@@ -80,24 +80,5 @@
     		return false;
   		});
 	})
-
-	function json2table(json, classes) {
-  		var cols = Object.keys(json[0]);
-		var headerRow = '';
-		var bodyRows = '';
-		classes = classes || '';
-		cols.map(function(col) {
-  			headerRow += '<th>' + capitalizeFirstLetter(col) + '</th>';
-		});
-		json.map(function(row) {
-  			bodyRows += '<tr>';
-
-  			bodyRows += '</tr>';
-		}
-	}
-
-	function capitalizeFirstLetter(string) {
-  		return string.charAt(0).toUpperCase() + string.slice(1);
-	}
 </script>
 </html>
