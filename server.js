@@ -413,7 +413,26 @@ app.post('/hotels', function(req,res){
             rooms.push(new Room({number: roomNumber, booked: roomBooked, price: roomPrice}));
          }
          newHotel.rooms = rooms;
-      }
+      } hotelDictionary = {};
+                  hotelDictionary["@context"] = "http://schema.org";
+                  hotelDictionary["@type"] = "Hotel";
+                  hotelDictionary["name"] = hotels[i].name;
+                  location = {};
+                  location["@type"] = "SearchAction";
+                  location["City"] = hotels[i].location["City"];
+                  location["_id"] = hotels[i].location["_id"];
+                  location["name"] = "http://localhost:8081/city/"+hotels[i].location["cityName"];
+                  location["latitude"] =  hotels[i].location["latitude"];
+                  location["longitude"] =  hotels[i].location["longitude"];
+                  location["Country"] =  hotels[i].location["country"];
+                  hotelDictionary["potentialAction"]= new Array();
+                  getHotel = {};
+                  getHotel["@type"] = "SearchAction";
+                  getHotel["name"] = hotels[i].name;
+                  getHotel["query"] = "http://localhost:8081/hotels/"+hotels[i]["_id"];
+                  hotelDictionary["potentialAction"].push(getHotel);
+                  hotelDictionary["potentialAction"].push(location);
+                  hotelResult.push(hotelDictionary);
          var location = new Location({cityName: req.body.hotels[i].cityName, 
             latitude: req.body.hotels[i].latitude, longitude: req.body.hotels[i].longitude, 
             country: req.body.hotels[i].countryName});
@@ -712,7 +731,26 @@ app.get('/city/:city', function(req, res){
       for(var i = 0; i<hotels.length; i++){
          if(hotels[i].location){
             if(hotels[i].location.cityName == req.params.city){
-               matchedHotels.push(hotels[i]);
+               cityDictionary = {};
+               cityDictionary["@context"] = "http://schema.org";
+               cityDictionary["@type"] = "Hotel";
+               cityDictionary["name"] = hotels[i].name;
+               location = {};
+               location["@type"] = "SearchAction";
+               location["City"] = hotels[i].location["City"];
+               location["_id"] = hotels[i].location["_id"];
+               location["name"] = "http://localhost:8081/city/"+hotels[i].location["cityName"];
+               location["latitude"] =  hotels[i].location["latitude"];
+               location["longitude"] =  hotels[i].location["longitude"];
+               location["Country"] =  hotels[i].location["country"];
+               cityDictionary["potentialAction"]= new Array();
+               getHotel = {};
+               getHotel["@type"] = "SearchAction";
+               getHotel["name"] = hotels[i].name;
+               getHotel["query"] = "http://localhost:8081/hotels/"+hotels[i]["_id"];
+               cityDictionary["potentialAction"].push(getHotel);
+               cityDictionary["potentialAction"].push(location);
+               matchedHotels.push(cityDictionary);
             }
          }
       }
