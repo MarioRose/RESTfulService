@@ -95,7 +95,7 @@ app.get('/hotel-api' , function(req,res){
     displayContents(contents);
   };
    res.end('index.html')
-};
+});
 
 app.get('/', function(req, res){
    res.setHeader('Content-Type', 'application/json');
