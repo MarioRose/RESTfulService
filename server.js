@@ -83,75 +83,35 @@ function save(obj) {
    });
 }
 
-var docApi = {
-      "@type" :"WebAPI",
-      "documentation":{
-      "potentialAction": [
-            {
-              "@type": "SearchAction",
-              "name" : "room",
-              "target": "http://127.0.0.1:8081/rooms?hotel={hotelid}",
-              "url-input": [
-                "name=hotel"
-              ]
-            },
-            {
-            "@type" : "CreateAction",
-            "target" :"http://127.0.0.1:81081/hotels",
-            "url-input": [
-                  "required name=name",
-                  "required name=stars",
-                  "required name=rating"
-                ]
-            },
-            {
-                  "@type" :"SearchAction",
-                  "target" : "127.0.0.1:8081/hotels"
-
-            },
-            {
-                  "@type": "SearchAction",
-                  "target": "http://127.0.0.1:8081/hotels/hotel={hotelid}",
-                  "url-input": [
-                    "required name=hotel"
-                  ]
-            },
-            {
-                  "@type" : "SearchAction",
-                  "target" : "http://127.0.0.1:8081/orders"
-            },
-            {
-                  "@type" : "OrderAction",
-                  "target": "http://127.0.0.1:8081/orders",
-                  "url-input": [
-                        "required "
-                  ]
-            },
-           
-
-          ]
-      }
-    };
-    var contextApi = {
-      "@context": "http://schema.org"
-      
-    };
-
 app.get('/hotels-api', function(req, res){
    res.setHeader('Content-Type', 'application/json');
-   jsonld.compact(docApi, contextApi, function(err, compacted) {
-      console.log(JSON.stringify(compacted, null, 2));
-      res.end(JSON.stringify(compacted,  null, 2));
-   });
-
 })
 
 app.get('/hotels', function (req, res) {
-    Hotel.find({}).exec((err, hotels) => {
-        if (err) return next(err);
-        res.json(hotels);
-      });  
+      
+      Hotel.find({}).exec((err, hotels) => {
+            if (err) return next(err);
+            hotelResult = new Array;
+            for(var i = 0; i<hotels.length; i++){
+                  
+                  hotelDictionary = {};
+                  hotelDictionary["@context"] = "http://schema.org";
+                  hotelDictionary["@type"] = "Hotel";
+                  hotelDictionary["name"] = hotels[i].name;
+                  hotelDictionary["location"] = hotels[i].location;
+                  hotelDictionary["potentialAction"]= new Array();
+                  getHotel = {};
+                  getHotel["@type"] = "SearchAction";
+                  getHotel["name"] = "hotel";
+                  getHotel["query"] = "http://localhost:8081/hotels"+hotels[i]["_id"];
+                  hotelDictionary["potentialAction"].push(getHotel);
+                  hotelResult.push(hotelDictionary);
+
+                  };
+            res.json(hotelResult);
+            });  
 })
+
 
 app.delete('/hotels',function (req,res) {
    Hotel.remove({}).exec(); 
@@ -210,7 +170,7 @@ app.post('/hotels/:name', function (req, res) {
       hotel.set({rooms: newRooms});
       save(hotel);
       res.end("New room was successfully created.");
-   });
+   });hotels
 })
 
 app.put('/hotels/:name', function (req, res) {
