@@ -469,12 +469,15 @@ app.get('/hotels/:id', function (req, res) {
                   location["longitude"] =  hotels[i].location["longitude"];
                   location["Country"] =  hotels[i].location["country"];
                   hotelDictionary["potentialAction"]= new Array();
-                  bookRoom = {};
-                  bookRoom["@type"] = "OrderAction";
-                  bookRoom["rooms"] = new Array();
+                  bookRoom = new Array();
                   for(var j = 0; j < hotels[i].rooms.length; j++){
-                     var room = hotels[i].rooms[j];
-                     bookRoom["rooms"].push(room);
+                     room = {};
+                     room["@type"] = "OrderAction";
+                     room["roomNumber"] = hotels[i].rooms[j]["number"];
+                     room["booked"] = hotels[i].rooms[j]["booked"];
+                     room["price"] = hotels[i].rooms[j]["price"];
+                     room["target"] = "http://localhost:8081/orders";
+                     bookRoom.push(room);
                };
                   hotelDictionary["potentialAction"].push(location);
                   hotelDictionary["potentialAction"].push(bookRoom);
