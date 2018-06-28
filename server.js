@@ -106,17 +106,6 @@ app.get('/', function(req, res){
    response["documentation"]["@type"] = "CreativeWork";
    response["documentation"]["hasPart"] = new Array();
 
-   room = {};
-   room["@type"] = "CreativeWork";
-   room["name"] = "room";
-
-   getRooms = {};
-   getRooms["@type"] = "SearchAction";
-   getRooms["target"] = host + "rooms?hotel={hotelid}";
-   getRooms["url-input"] = new Array("name=hotel");
-
-   room["potentialAction"] = new Array(getRooms);
-
    hotel = {};
    hotel["@type"] = "CreativeWork";
    hotel["name"] = "hotel";
@@ -124,44 +113,38 @@ app.get('/', function(req, res){
 
    postHotel = {};
    postHotel["@type"] = "CreateAction";
-   postHotel["target"] = host + "hotel?user={userId}&key={keyString}&location={locationId}&rooms={roomsString}&stars={starsNumber}&price={priceString}&name={nameString}";
-   postHotel["url-input"] = new Array();
-   postHotel["url-input"].push("required name=user");
-   postHotel["url-input"].push("required name=key");
-   postHotel["url-input"].push("required name=location");
-   postHotel["url-input"].push("required name=rooms");
-   postHotel["url-input"].push("required name=stars");
-   postHotel["url-input"].push("required name=price");
-   postHotel["url-input"].push("required name=name");
+   postHotel["target"] = host + "hotel";
+   postHotel["body-param"] = new Array();
+   postHotel["body-param"].push("required name");
+   postHotel["body-param"].push("required rooms");
+   postHotel["body-param"].push("required stars");
+   postHotel["body-param"].push("required location");
+   postHotel["body-param"].push("required rating");
 
    getHotel = {};
    getHotel["@type"] = "SearchAction";
-   getHotel["target"] = host + "hotel?hotel={hotelid}"
-   getHotel["url-input"] = new Array("required name=hotel");
+   getHotel["target"] = host + "hotels/{hotelId}"
+   getHotel["url-input"] = new Array("required hotelId");
 
    getHotels = {};
    getHotels["@type"] = "SearchAction";
-   getHotels["target"] = host + "hotels?location={locationId}&distance={distanceNumber}";
-   getHotels["url-input"] = new Array();
-   getHotels["url-input"].push("name=location")
-   getHotels["url-input"].push("name=distance")
+   getHotels["target"] = host + "hotels";
 
    updateHotel = {};
    updateHotel["@type"] = "UpdateAction";
-   updateHotel["target"] = host + "hotels?hotel={hotelId}&user={userId}&key={keyString}&stars={starsNumber}";
+   updateHotel["target"] = host + "hotels/{hotelId}";
    updateHotel["url-input"] = new Array();
-   updateHotel["url-input"].push("required name=hotel");
-   updateHotel["url-input"].push("required name=user");
-   updateHotel["url-input"].push("required name=key");
-   updateHotel["url-input"].push("required name=stars");
+   updateHotel["url-input"].push("required hotelid");
+   updateHotel["body-param"] = new Array();
+   updateHotel["body-param"].push("newRooms");
+   updateHotel["body-param"].push("newStars");
+   updateHotel["body-param"].push("newRating");
 
    deleteHotel = {};
    deleteHotel["@type"] = "DeleteAction";
-   deleteHotel["target"] = host + "hotels?hotel={hotelId}&user={userId}&key={keyString}";
+   deleteHotel["target"] = host + "hotels/{hotelId}";
    deleteHotel["url-input"] = new Array();
-   deleteHotel["url-input"].push("required name=hotel");
-   deleteHotel["url-input"].push("required name=user");
-   deleteHotel["url-input"].push("required name=key");
+   deleteHotel["url-input"].push("required hotelId");
 
    deleteHotels = {};
    deleteHotels["@type"] = "DeleteAction";
@@ -181,75 +164,44 @@ app.get('/', function(req, res){
 
    postUser = {};
    postUser["@type"] = "CreateAction";
-   postUser["target"] = host + "user?firstname={firstName}&lastname={lastName}&email={emailString}&creator={creatorBool}&passkey={keyString}&user={creatorId}&user_key={creatorKeyString}";
-   postUser["url-input"] = new Array();
-   postUser["url-input"].push("required name=firstname");
-   postUser["url-input"].push("required name=lastname");
-   postUser["url-input"].push("required name=email");
-   postUser["url-input"].push("required name=creator");
-   postUser["url-input"].push("required name=passkey");
-   postUser["url-input"].push("required name=user");
-   postUser["url-input"].push("required name=key");
+   postUser["target"] = host + "users";
+   postUser["body-param"] = new Array();
+   postUser["body-param"].push("required firstName");
+   postUser["body-param"].push("required lastName");
+   postUser["body-param"].push("required email");
+   postUser["body-param"].push("required password");
 
-   deleteUser = {};
-   deleteUser["@type"] = "DeleteAction";
-   deleteUser["target"] = host + "user?user1={creatorId}&user2={userId}&key={creatorKey}";
-   deleteUser["url-input"] = new Array();
-   deleteUser["url-input"].push("required name=user1");
-   deleteUser["url-input"].push("required name=user2");
-   deleteUser["url-input"].push("required name=key");
-
-   updateUser = {};
-   updateUser["@type"] = "UpdateAction";
-   updateUser["target"] = host + "user?firstname={firstName}&lastname={lastName}&email={emailString}&creator={creatorBool}&passkey={keyString}&user1={creatorId}&user2={userId}&user_key={creatorKeyString}";
-   updateUser["url-input"] = new Array();
-   updateUser["url-input"].push("required name=firstname");
-   updateUser["url-input"].push("required name=lastname");
-   updateUser["url-input"].push("required name=email");
-   updateUser["url-input"].push("required name=creator");
-   updateUser["url-input"].push("required name=passkey");
-   updateUser["url-input"].push("required name=user1");
-   updateUser["url-input"].push("required name=user2");
-   updateUser["url-input"].push("required name=key");
+   deleteUsers = {};
+   deleteUsers["@type"] = "DeleteAction";
+   deleteUsers["target"] = host + "users";
 
    user["potentialAction"].push(postUser);
-   user["potentialAction"].push(deleteUser);
-   user["potentialAction"].push(updateUser);
+   user["potentialAction"].push(deleteUsers);
 
-   location = {};
-   location["@type"] = "CreativeWork";
-   location["name"] = "Location";
-   location["potentialAction"] = new Array();
+   city = {};
+   city["@type"] = "CreativeWork";
+   city["name"] = "City";
+   city["potentialAction"] = new Array();
 
-   createLocation = {};
-   createLocation["@type"] = "CreateAction";
-   createLocation["target"] = host + "location?location={locationName}&lat={latitude}&lon={longitude}&country={countryString}";
-   createLocation["url-input"] = new Array();
-   createLocation["url-input"].push("required name=location");
-   createLocation["url-input"].push("required name=lat");
-   createLocation["url-input"].push("required name=lon");
-   createLocation["url-input"].push("required name=country");
+   searchCity = {};
+   searchCity["@type"] = "SearchAction";
+   searchCity["target"] = host + "city/{cityName}";
+   searchCity["url-input"] = new Array();
+   searchCity["url-input"].push("required cityName");
 
-   searchLocations = {};
-   searchLocations["@type"] = "SearchAction";
-   searchLocations["target"] = "localhost:8081/locations";
+   city["potentialAction"].push(searchCity);
 
-   searchLocation = {};
-   searchLocation["@type"] = "SearchAction";
-   searchLocation["target"] = host + "location?hotel={hotelId}";
-   searchLocation["url-input"] = new Array();
-   searchLocation["url-input"].push("required name=hotel");
+   country = {};
+   country["@type"] = "CreativeWork";
+   country["name"] = "Country";
+   country["potentialAction"] = new Array();
 
-   deleteLocation = {};
-   deleteLocation["@type"] = "DeleteAction";
-   deleteLocation["target"] = host + "location?location={locationId}";
-   deleteLocation["url-input"] = new Array();
-   deleteLocation["url-input"].push("required name=location");
+   searchCountry = {};
+   searchCountry["@type"] = "SearchAction";
+   searchCountry["target"] = host + "country/{countryName}";
+   searchCountry["url-input"] = new Array("required countryName");
 
-   location["potentialAction"].push(createLocation);
-   location["potentialAction"].push(searchLocations);
-   location["potentialAction"].push(searchLocation);
-   location["potentialAction"].push(deleteLocation);
+   country["potentialAction"].push(searchCountry);
 
    review = {};
    review["@type"] = "CreativeWork";
@@ -281,57 +233,122 @@ app.get('/', function(req, res){
 
    createOrder = {};
    createOrder["@type"] = "CreateAction";
-   createOrder["target"] = host + "booking?hotel={hotelId}&user={creatorId}&key={keyString}&room={roomId}&start={startDate}&end={endDate}";
-   createOrder["url-input"] = new Array();
-   createOrder["url-input"].push("required name=hotel");
-   createOrder["url-input"].push("required name=user");
-   createOrder["url-input"].push("required name=key");
-   createOrder["url-input"].push("required name=room");
-   createOrder["url-input"].push("required name=start");
-   createOrder["url-input"].push("required name=end");
+   createOrder["target"] = host + "order";
+   createOrder["body-param"] = new Array();
+   createOrder["body-param"].push("required hotelId");
+   createOrder["body-param"].push("required roomNumber");
 
    searchOrders = {};
    searchOrders["@type"] = "SearchAction";
-   searchOrders["target"] = host + "bookings?room={userId}";
-   searchOrders["url-input"] = new Array();
-   searchOrders["url-input"].push("name=user");
+   searchOrders["target"] = host + "orders";
 
-   deleteOrder = {};
-   deleteOrder["@type"] = "DeleteAction";
-   deleteOrder["target"] = host + "reservation?booker={bookerId}&booking={bookingId}&user={creatorId}&key={keyString}";
-   deleteOrder["url-input"] = new Array();
-   deleteOrder["url-input"].push("required name=booker");
-   deleteOrder["url-input"].push("required name=booking");
-   deleteOrder["url-input"].push("required name=user");
-   deleteOrder["url-input"].push("required name=key");
+   searchOrder = {};
+   searchOrder["@type"] = "SearchAction";
+   searchOrder["target"] = host + "orders/{hotelId}";
+   searchOrder["url-input"] = new Array("required hotelId");
+
+   deleteOrders = {};
+   deleteOrders["@type"] = "DeleteAction";
+   deleteOrders["target"] = host + "order";
 
    order["potentialAction"].push(createOrder);
    order["potentialAction"].push(searchOrders);
-   order["potentialAction"].push(deleteOrder);
+   order["potentialAction"].push(searchOrder);
+   order["potentialAction"].push(deleteOrders);
 
    offer = {};
    offer["@type"] = "CreativeWork";
    offer["name"] = "Offer";
    offer["potentialAction"] = new Array();
 
+   searchOffers = {};
+   searchOffers["@type"] = "SearchAction";
+   searchOffers["target"] = host + "offers";
+
    searchOffer = {};
    searchOffer["@type"] = "SearchAction";
-   searchOffer["target"] = host + "offer?hotel={hotelId}&room={roomId}&start={startDate}&end={endDate}";
-   searchOffer["url-input"] = new Array();
-   searchOffer["url-input"].push("required name=hotel");
-   searchOffer["url-input"].push("required name=room");
-   searchOffer["url-input"].push("required name=start");
-   searchOffer["url-input"].push("required name=end");
+   searchOffer["target"] = host + "offers/{hotelId}";
+   searchOffer["url-input"] = new Array("required hotelId");
 
-   offer["potentialAction"].push(searchOffer)
+   postOffer = {};
+   postOffer["@type"] = "CreateAction";
+   postOffer["target"] = host + "offer";
+   postOffer["body-param"] = new Array();
+   postOffer["body-param"].push("required hotelId");
+   postOffer["body-param"].push("required roomNumber");
+   postOffer["body-param"].push("required startDate");
+   postOffer["body-param"].push("required endDate");
+   postOffer["body-param"].push("required discount");
 
-   response["documentation"]["hasPart"].push(room);
+   offer["potentialAction"].push(searchOffer);
+   offer["potentialAction"].push(searchOffers);
+   offer["potentialAction"].push(postOffer);
+
+   stars = {};
+   stars["@type"] = "CreativeWork";
+   stars["name"] = "Stars";
+   stars["potentialAction"] = new Array();
+
+   searchStars = {};
+   searchStars["@type"] = "SearchAction";
+   searchStars["target"] = host + "stars/{stars}";
+   searchStars["url-input"] = new Array("required stars");
+
+   stars["potentialAction"].push(searchStars);
+
+   rating = {};
+   rating["@type"] = "CreativeWork";
+   rating["name"] = "Rating";
+   rating["potentialAction"] = new Array();
+
+   searchRating = {};
+   searchRating["@type"] = "SearchAction";
+   searchRating["target"] = host + "rating/{rating}";
+   searchRating["url-input"] = new Array("required rating");
+
+   rating["potentialAction"].push(searchRating);
+
+   reviews = {};
+   reviews["@type"] = "CreativeWork";
+   reviews["name"] = "Reviews";
+   reviews["potentialAction"] = new Array();
+
+   searchReview = {};
+   searchReview["@type"] = "SearchAction";
+   searchReview["target"] = host + "reviews/{hotelId}";
+   searchReview["body-param"] = new Array();
+   searchReview["body-param"].push("required hotelId");
+   searchReview["body-param"].push("required roomNumber");
+   searchReview["body-param"].push("required startDate");
+   searchReview["body-param"].push("required endDate");
+   searchReview["body-param"].push("required discount");
+
+   deleteReviews = {};
+   deleteReviews["@type"] = "DeleteAction";
+   deleteReviews["target"] = host + "reviews";
+
+   postReview = {};
+   postReview["@type"] = "CreateAction";
+   postReview["target"] = host + "reviews";
+   postReview["body-param"] = new Array();
+   postReview["body-param"].push("required hotelId");
+   postReview["body-param"].push("required userMail");
+   postReview["body-param"].push("required review");
+
+   reviews["potentialAction"].push(searchReview);
+   reviews["potentialAction"].push(deleteReviews);
+   reviews["potentialAction"].push(postReview);
+
    response["documentation"]["hasPart"].push(hotel);
    response["documentation"]["hasPart"].push(user);
-   response["documentation"]["hasPart"].push(location);
+   response["documentation"]["hasPart"].push(city);
+   response["documentation"]["hasPart"].push(country);
    response["documentation"]["hasPart"].push(review);
    response["documentation"]["hasPart"].push(order);
    response["documentation"]["hasPart"].push(offer);
+   response["documentation"]["hasPart"].push(stars);
+   response["documentation"]["hasPart"].push(rating);
+   response["documentation"]["hasPart"].push(reviews);
 
    res.end(JSON.stringify(response));
 })
